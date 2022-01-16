@@ -29,7 +29,7 @@ def process(queryString):
 	useIdFilter = '-ID' in queryString
 
 	useCountryCode = '-CODES' in queryString
-	countriesToSearchFor = queryString[queryString.index('-CODES')+1].upper() if useCountryCode else []
+	countriesToSearchFor = queryString[queryString.index('-CODES')+1] if useCountryCode else []
 
 	useNegHeightFilter = '-HEIGHT' in queryString
 	usePlusHeightFilter = '+HEIGHT' in queryString
@@ -88,10 +88,10 @@ def process(queryString):
 	printOnlyEligable = '-ELIG' in queryString
 
 	usePositionFilter = '-POS' in queryString
-	positionFilter = queryString[queryString.index('-POS')+1].upper() if usePositionFilter else "";
+	positionFilter = queryString[queryString.index('-POS')+1] if usePositionFilter else "";
 
 	useHandFilter = '-HAND' in queryString
-	handFilter = queryString[queryString.index('-HAND')+1].upper() if useHandFilter else "";
+	handFilter = queryString[queryString.index('-HAND')+1] if useHandFilter else "";
 
 	useLeagueFilter = '-LEAGUES' in queryString
 	leaguesFilter = queryString[queryString.index('-LEAGUES')+1] if useLeagueFilter else [];
@@ -100,7 +100,7 @@ def process(queryString):
 		filterNameForSorting = "-LEAGUES"
 
 	useTeamFilter = '-TEAMS' in queryString
-	teamsFilter = queryString[queryString.index('-TEAMS')+1].upper() if useTeamFilter else [];
+	teamsFilter = queryString[queryString.index('-TEAMS')+1] if useTeamFilter else [];
 	if useTeamFilter:
 		filterNameForSorting = "-TEAMS"
 
@@ -138,7 +138,7 @@ def process(queryString):
 		results.append("\n")
 
 		if len(countriesToSearchFor) > 0:
-			results.append("Searching Birth Country Codes: " + countriesToSearchFor)
+			results.append("Searching Birth Country Codes: " + str(countriesToSearchFor))
 
 		results.append("Print All Player Info: " + str(printAllInfo))
 		results.append("Print Only Ranked Players: " + str(printOnlyRanked))
@@ -201,7 +201,7 @@ def process(queryString):
 														playerList.append(newPlayer)
 														
 	# elif useIdFilter:
-		# nhlPlayerId = queryString[queryString.index('-ID')+1].upper() if useIdFilter else "";
+		# nhlPlayerId = queryString[queryString.index('-ID')+1] if useIdFilter else "";
 		# results.append("\n")
 		# results.append("Using Player NHL ID Filter: " + nhlPlayerId)
 		# response = requests.get("https://statsapi.web.nhl.com/api/v1/draft/prospects/" + nhlPlayerId)
