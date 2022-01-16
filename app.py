@@ -36,7 +36,7 @@ def processQueryString(queryString):
 			part.replace(" ", "")
 			parts.append(part.split(","))
 	return parts
-	
+
 def run(queryString):
 	results = []
 	queryString = processQueryString(queryString.upper())
