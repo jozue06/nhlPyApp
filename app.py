@@ -37,6 +37,9 @@ def processQueryString(queryString):
 			parts.append(part.split(","))
 	return parts
 
+if __name__ == '__main__':
+    app.run()
+
 def run(queryString):
 	results = []
 	queryString = processQueryString(queryString.upper())
