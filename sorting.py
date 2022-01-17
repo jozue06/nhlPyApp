@@ -21,5 +21,4 @@ def sort(list, filterName):
 	if filterName == "-RANK":
 		newlist = sorted(list, key=lambda x: x.ranks['midterm'])
 		
-
 	return newlist

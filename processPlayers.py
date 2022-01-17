@@ -4,7 +4,6 @@ def processPlayers(playerList, stringListResults):
 	
 	for p in playerList:
 		stringListResults.append("\n***********************************************\n")
-		stringListResults.append("#index" + str(p.index))
 		stringListResults.append("Player NHL ID: " + str(p.id))
 		stringListResults.append("Player Full Name: " + p.fullName)
 		stringListResults.append("Player Birth Date: " + p.birthDate)
@@ -34,9 +33,9 @@ def processPlayers(playerList, stringListResults):
 			else:
 				stringListResults.append("Player Shot Hand: N/A")
 		stringListResults.append("Player Draft Eligibility: " + p.draftStatus)
-		if p.amateurTeam['name']:
+		if 'name' in p.amateurTeam and p.amateurTeam:
 			stringListResults.append("Player Amateur Team: " + p.amateurTeam['name'])
-		if p.amateurLeague and p.amateurLeague['name']:
+		if 'name' in p.amateurLeague and p.amateurLeague:
 			stringListResults.append("Player Amateur League: " + p.amateurLeague['name'])
 		if 'midterm' in p.ranks:
 			stringListResults.append("Player midterm Rank: " + str(p.ranks['midterm']))

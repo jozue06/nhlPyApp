@@ -1,8 +1,9 @@
 import requests
 from sorting import sort
+import predicates
 from  processPlayers import processPlayers 
 from playerClass import Player
-from utils import convert_height, calculateAge
+
 
 def processQueryString(queryString):
 	partsToReturn = []
@@ -25,73 +26,72 @@ def processQueryString(queryString):
 def process(queryString):
 	results = []
 	filterNameForSorting = "-NAME"
-	queryString = processQueryString(queryString.upper())
-	useIdFilter = '-ID' in queryString
 
+	queryString = processQueryString(queryString.upper())
+
+	useIdFilter = '-ID' in queryString
 	useCountryCode = '-CODES' in queryString
 	countriesToSearchFor = queryString[queryString.index('-CODES')+1] if useCountryCode else []
 
 	useNegHeightFilter = '-HEIGHT' in queryString
 	usePlusHeightFilter = '+HEIGHT' in queryString
-	heightFilter = ""
+	heightFilter = 0
 	if useNegHeightFilter:
-		heightFilter = queryString[queryString.index('-HEIGHT')+1]
+		heightFilter = queryString[queryString.index('-HEIGHT')+1][0]
 		filterNameForSorting = "-HEIGHT"
 	elif usePlusHeightFilter:
-		heightFilter = queryString[queryString.index('+HEIGHT')+1]
+		heightFilter = queryString[queryString.index('+HEIGHT')+1][0]
 		filterNameForSorting = "+HEIGHT"
-	useHeightFilter = heightFilter != ""
+	useHeightFilter = int(heightFilter) > 0
 
 	useNegAgeFilter = '-AGE' in queryString
 	usePlusAgeFilter = '+AGE' in queryString
-	ageFilter = ""
+	ageFilter = 0
 	if useNegAgeFilter:
-		ageFilter = queryString[queryString.index('-AGE')+1]
+		ageFilter = queryString[queryString.index('-AGE')+1][0]
 		filterNameForSorting = "-AGE"
 	elif usePlusAgeFilter:
-		ageFilter = queryString[queryString.index('+AGE')+1]
+		ageFilter = queryString[queryString.index('+AGE')+1][0]
 		filterNameForSorting = "+AGE"
-
-	useAgeFilter = ageFilter != ""
+	useAgeFilter = int(ageFilter) > 0
 
 	useNegWeightFilter = '-WEIGHT' in queryString
 	usePlusWeightFilter = '+WEIGHT' in queryString
-	weightFilter = ""
+	weightFilter = 0
 	if useNegWeightFilter:
-		weightFilter = queryString[queryString.index('-WEIGHT')+1]
+		weightFilter = queryString[queryString.index('-WEIGHT')+1][0]
 		filterNameForSorting = "-WEIGHT"
 	elif usePlusWeightFilter:
-		weightFilter = queryString[queryString.index('+WEIGHT')+1]
+		weightFilter = queryString[queryString.index('+WEIGHT')+1][0]
 		filterNameForSorting = "+WEIGHT"
 
-	useWeightFilter = weightFilter != ""
+	useWeightFilter = int(weightFilter) > 0
 
 	printOnlyRanked = '-RANKED' in queryString
 
 	useNegRankFilter = '-MAX-RANK' in queryString
 	usePlusRankFilter = '-MIN-RANK' in queryString
-	rankFilter = "0"
+	rankFilter = 0
 	if useNegRankFilter:
-		rankFilter = queryString[queryString.index('-MAX-RANK')+1]
+		rankFilter = queryString[queryString.index('-MAX-RANK')+1][0]
 		filterNameForSorting = "-MAX-RANK"
 	elif usePlusRankFilter:
-		rankFilter = queryString[queryString.index('-MIN-RANK')+1]
+		rankFilter = queryString[queryString.index('-MIN-RANK')+1][0]
 		filterNameForSorting = "-MIN-RANK"
 
-	useRankFilter = rankFilter != ""
+	useRankFilter = int(rankFilter) > 0
 
 	if useRankFilter:
 		printOnlyRanked = True
 		filterNameForSorting = "-RANK"
 
-	printAllInfo = '-ALL' in queryString
 	printOnlyEligable = '-ELIG' in queryString
 
 	usePositionFilter = '-POS' in queryString
-	positionFilter = queryString[queryString.index('-POS')+1] if usePositionFilter else "";
+	positionFilter = queryString[queryString.index('-POS')+1][0] if usePositionFilter else "";
 
 	useHandFilter = '-HAND' in queryString
-	handFilter = queryString[queryString.index('-HAND')+1] if useHandFilter else "";
+	handFilter = queryString[queryString.index('-HAND')+1][0] if useHandFilter else "";
 
 	useLeagueFilter = '-LEAGUES' in queryString
 	leaguesFilter = queryString[queryString.index('-LEAGUES')+1] if useLeagueFilter else [];
@@ -103,14 +103,13 @@ def process(queryString):
 	teamsFilter = queryString[queryString.index('-TEAMS')+1] if useTeamFilter else [];
 	if useTeamFilter:
 		filterNameForSorting = "-TEAMS"
-
+	playerList = []
 	if "-H" in queryString or "-h" in queryString:
 		results.append("\n")
 		results.append("****************************THE HELP MENU****************************")
 		results.append("\n")
 		results.append("To Show Ranked Players Only add -RANKED")
 		results.append("To Show Draft Eligable Players Only add -ELIG")
-		results.append("To Show Full Player Info Object add -ALL")
 		results.append("\n")
 		results.append("To Use the Country Code Filter add -CODES followed directly \"codeOne,codeTwo\"")
 		results.append("To Use the League Filter add -LEAGUES followed directly \"league one name,league two name\"")
@@ -134,41 +133,55 @@ def process(queryString):
 		results.append("\n")
 		results.append("*********************************************************************")
 		results.append("\n")
-	elif useCountryCode or useNegHeightFilter or usePlusHeightFilter or useNegAgeFilter or usePlusAgeFilter or useNegWeightFilter or usePlusWeightFilter or printOnlyRanked or useNegRankFilter or usePlusRankFilter or useRankFilter or printAllInfo or printOnlyEligable or usePositionFilter or useHandFilter or useLeagueFilter or useTeamFilter:
+	elif (useCountryCode or \
+		useNegHeightFilter or \
+		usePlusHeightFilter or \
+		useNegAgeFilter or \
+		usePlusAgeFilter or \
+		useNegWeightFilter or \
+		usePlusWeightFilter or \
+		printOnlyRanked or \
+		useNegRankFilter or \
+		usePlusRankFilter or \
+		useRankFilter or \
+		printOnlyEligable or \
+		usePositionFilter or \
+		useHandFilter or \
+		useLeagueFilter or \
+		useTeamFilter) and not useIdFilter:
 		results.append("\n")
 
 		if len(countriesToSearchFor) > 0:
 			results.append("Searching Birth Country Codes: " + str(countriesToSearchFor))
 
-		results.append("Print All Player Info: " + str(printAllInfo))
 		results.append("Print Only Ranked Players: " + str(printOnlyRanked))
 		results.append("Print Only Draft Eligable Players: " + str(printOnlyEligable))
 
 		if usePositionFilter:
-			results.append("Using Position Filter: " + positionFilter)
+			results.append("Using Position Filter: " + str(positionFilter))
 
 		if useHandFilter:
-			results.append("Using Hand / Side Filter: " + handFilter)	
+			results.append("Using Hand / Side Filter: " + str(handFilter))
 
 		weightFilterEquality = "<=" if useNegWeightFilter else ">="
 
 		if useWeightFilter:
-			results.append("Using Weight Filter: " + weightFilterEquality + " " + weightFilter)	
+			results.append("Using Weight Filter: " + weightFilterEquality + " " + str(weightFilter))
 
 		heightFilterEquality = "<=" if useNegHeightFilter else ">="
 
 		if useHeightFilter:
-			results.append("Using Height Filter: " + heightFilterEquality + " " + heightFilter)	
+			results.append("Using Height Filter: " + heightFilterEquality + " " + str(heightFilter))
 
 		ageFilterEquality = "<=" if useNegAgeFilter else ">="
 
 		if useAgeFilter:
-			results.append("Using Age Filter: " + ageFilterEquality + " " + ageFilter)
+			results.append("Using Age Filter: " + ageFilterEquality + " " + str(ageFilter))
 
 		rankFilterEquality = "<=" if useNegRankFilter else ">="
 
 		if useRankFilter:
-			results.append("Using Rank Filter: " + rankFilterEquality + " " + rankFilter)	
+			results.append("Using Rank Filter: " + rankFilterEquality + " " + str(rankFilter))
 
 		if len(leaguesFilter) > 0:
 			results.append("Using Leagues Filter: " + str(leaguesFilter))
@@ -177,74 +190,47 @@ def process(queryString):
 			results.append("Using Leagues Filter: " + str(teamsFilter))
 
 		response = requests.get("https://statsapi.web.nhl.com/api/v1/draft/prospects")
-
-		index = 0;
-		playerList = []
-		for p in response.json()['prospects']:
-			if useCountryCode == False or ('birthCountry' in p and p['birthCountry'] in countriesToSearchFor):
-				if useRankFilter == False or ('finalrank' in p['ranks'] and int(p['finalrank']['midterm']) <= int(rankFilter)) if useNegRankFilter else ('finalrank' in p['ranks'] and int(p['finalrank']['midterm']) >= int(rankFilter)) or ('midterm' in p['ranks'] and int(p['ranks']['midterm']) <= int(rankFilter)) if useNegRankFilter else ('midterm' in p['ranks'] and int(p['ranks']['midterm']) >= int(rankFilter)):
-					if printOnlyEligable == False or ('draftStatus' in p and "Elig" in p['draftStatus']):
-						if usePositionFilter == False or (positionFilter in p['primaryPosition']['abbreviation']):
-							if useHandFilter == False or 'shootsCatches' in p and (handFilter in p['shootsCatches']):
-								if useHeightFilter == False or 'height' in p and (convert_height(p['height']) <= convert_height(heightFilter) if useNegHeightFilter else convert_height(p['height']) >= convert_height(heightFilter)):
-									if useWeightFilter == False or 'weight' in p and (int(p['weight']) <= int(weightFilter) if useNegWeightFilter else int(p['weight']) >= int(weightFilter)):
-										if useAgeFilter == False or (int(calculateAge(p['birthDate'])) <= int(ageFilter) if useNegAgeFilter else int(calculateAge(p['birthDate'])) >= int(ageFilter)):
-											if useLeagueFilter == False or ('amateurLeague' in p and 'name' in p['amateurLeague'] and p['amateurLeague']['name'] in leaguesFilter):
-												if useTeamFilter == False or ('amateurTeam' in p and 'name' in p['amateurTeam'] and p['amateurTeam']['name'] in teamsFilter):
-													index += 1
-													if printAllInfo:
-														results.append("#" + str(index))
-														results.append("Player Current Age: " + str(calculateAge(p['birthDate'])))
-														results.append("Full Player: " + json.dumps(p, indent=4))
-													else:
-														newPlayer = Player(p=p, index=index)
-														playerList.append(newPlayer)
-														
-	# elif useIdFilter:
-		# nhlPlayerId = queryString[queryString.index('-ID')+1] if useIdFilter else "";
-		# results.append("\n")
-		# results.append("Using Player NHL ID Filter: " + nhlPlayerId)
-		# response = requests.get("https://statsapi.web.nhl.com/api/v1/draft/prospects/" + nhlPlayerId)
-		# json = response.json()['prospects']
-		# for p in json:
-		# 	results.append("\n***********************************************\n")
-		# 	results.append("Player NHL ID: " + str(p['id']))
-		# 	results.append("Player Full Name: " + p['fullName'])
-		# 	results.append("Player Birth Date: " + p['birthDate'])
-		# 	results.append("Player Current Age: " + str(calculateAge(p['birthDate'])))
-		# 	if 'height' in p:
-		# 		results.append("Player Height: " + p['height'])
-		# 	else:
-		# 		results.append("Player Height: N/A")
-		# 	if 'weight'	in p:
-		# 		results.append("Player Weight: " + str(p['weight']) + "lbs")
-		# 	else:
-		# 		results.append("Player Weight: N/A")
-		# 	if 'birthCountry' in p:
-		# 		results.append("Player Birth Country: " + p['birthCountry'])
-		# 	else: 
-		# 		results.append("Player Birth Country: N/A")
-
-		# 	results.append("Player Position: " + p['primaryPosition']['name'])
-		# 	if 'G' in p['primaryPosition']['abbreviation']:
-		# 		if 'shootsCatches' in p:
-		# 			results.append("Player Glove Hand: " + p['shootsCatches'])
-		# 		else:
-		# 			results.append("Player Glove Hand: N/A")
-		# 	else:
-		# 		if 'shootsCatches' in p:
-		# 			results.append("Player Shot Hand: " + p['shootsCatches'])	
-		# 		else:
-		# 			results.append("Player Shot Hand: N/A")
-		# 	results.append("Player Draft Eligibility: " + p['draftStatus'])
-		# 	if 'name' in p['amateurTeam']:
-		# 		results.append("Player Amateur Team: " + p['amateurTeam']['name'])
-		# 	if 'amateurLeague' in p and 'name' in p['amateurLeague']:
-		# 		results.append("Player Amateur League: " + p['amateurLeague']['name'])
-		# 	if 'midterm' in p['ranks']:
-		# 		results.append("Player midterm Rank: " + str(p['ranks']['midterm']))
-		# 	if 'finalrank' in p['ranks']:
-		# 		results.append("Player finalrank Rank: " + str(p['ranks']['finalrank']))
 		
-		processPlayers(sort(playerList, filterName=filterNameForSorting), results)
+		
+		for p in response.json()['prospects']:
+			if predicates.all(p, 
+				useCountryCode, 
+				countriesToSearchFor,
+				useRankFilter, 
+				rankFilter, 
+				useNegRankFilter,
+				printOnlyEligable,
+				usePositionFilter, 
+				positionFilter,
+				useHandFilter, 
+				handFilter,
+				useHeightFilter, 
+				heightFilter, 
+				useNegHeightFilter,
+				weightFilter, 
+				useNegWeightFilter,
+				useAgeFilter, 
+				ageFilter, 
+				useNegAgeFilter,
+				leaguesFilter,
+				useTeamFilter, 
+				teamsFilter):
+					newPlayer = Player(p=p)
+					playerList.append(newPlayer)
+		processPlayers(sort(playerList, filterName=filterNameForSorting), results)		
+	elif useIdFilter:
+		nhlPlayerId = queryString[queryString.index('-ID')+1][0] if useIdFilter else ""
+
+		results.append("\n")
+		results.append("Using Player NHL ID Filter: " + nhlPlayerId)
+
+		response = requests.get("https://statsapi.web.nhl.com/api/v1/draft/prospects/" + nhlPlayerId)
+
+		json = response.json()['prospects']
+		for p in json:
+			newPlayer = Player(p=p)
+			playerList.append(newPlayer)
+
+		processPlayers(playerList, results)
+
 	return results
