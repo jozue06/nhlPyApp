@@ -30,7 +30,7 @@ export class Form extends React.Component {
 	render() {
 		return (
 			<div className="input-wrapper">
-				This is the React.js version of the NHL Prospect Terminal App
+				<h1>This is the React.js version of the NHL Prospect Terminal App</h1>
 				<form onSubmit={this.handleSubmit}>
 					<textarea 
 						value={this.state.value} 
