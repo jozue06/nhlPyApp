@@ -7,8 +7,9 @@ from playerClass import Player
 
 def processQueryString(queryString):
 	partsToReturn = []
-	parts = queryString.split(" ")
-	
+
+	parts = queryString.rstrip().split(" ")
+
 	for part in parts:
 		if "-" in part:
 			partsToReturn.append(part)
@@ -193,7 +194,8 @@ def process(queryString):
 		
 		
 		for p in response.json()['prospects']:
-			if predicates.all(p, 
+			if predicates.all(
+				p,  
 				useCountryCode, 
 				countriesToSearchFor,
 				useRankFilter, 
@@ -212,6 +214,7 @@ def process(queryString):
 				useAgeFilter, 
 				ageFilter, 
 				useNegAgeFilter,
+				useLeagueFilter,
 				leaguesFilter,
 				useTeamFilter, 
 				teamsFilter):

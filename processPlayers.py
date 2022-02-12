@@ -1,9 +1,10 @@
 from utils import calculateAge
 
 def processPlayers(playerList, stringListResults):
-	
+	index = 1
 	for p in playerList:
-		stringListResults.append("\n***********************************************\n")
+		topline = "# " + str(index) + " \n***********************************************\n"
+		stringListResults.append(topline)
 		stringListResults.append("Player NHL ID: " + str(p.id))
 		stringListResults.append("Player Full Name: " + p.fullName)
 		stringListResults.append("Player Birth Date: " + p.birthDate)
@@ -40,4 +41,5 @@ def processPlayers(playerList, stringListResults):
 		if 'midterm' in p.ranks:
 			stringListResults.append("Player midterm Rank: " + str(p.ranks['midterm']))
 		if 'finalrank' in p.ranks:
-			stringListResults.append("Player finalrank Rank: " + str(p.ranks['finalrank']))			
+			stringListResults.append("Player finalrank Rank: " + str(p.ranks['finalrank']))	
+		index += 1

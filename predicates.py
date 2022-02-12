@@ -84,6 +84,7 @@ def all(p,
 		useAgeFilter, 
 		ageFilter, 
 		useNegAgeFilter,
+		useLeagueFilter,
 		leaguesFilter,
 		useTeamFilter, 
 		teamsFilter):
@@ -95,5 +96,5 @@ def all(p,
 				filterSix(useHeightFilter, p, heightFilter, useNegHeightFilter) and \
 				filterSeven(useNegWeightFilter, p, weightFilter, useNegWeightFilter) and \
 				filterEight(useAgeFilter, p, ageFilter, useNegAgeFilter) and \
-				filterNine(useAgeFilter, p, leaguesFilter) and \
+				filterNine(useLeagueFilter, p, leaguesFilter) and \
 				filterTen(useTeamFilter, p, teamsFilter)
