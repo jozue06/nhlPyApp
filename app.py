@@ -5,7 +5,7 @@ import json
 app = Flask(__name__, static_url_path='', static_folder='app/build')
 
 
-@app.route("/react")
+@app.route("/react", methods=["GET"])
 def serve():
     return send_from_directory(app.static_folder, 'index.html')
 
