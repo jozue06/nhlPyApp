@@ -7,7 +7,8 @@ app = Flask(__name__, static_url_path='', static_folder='app/build')
 
 @app.route("/react", methods=["GET"])
 def indexReact():
-    return send_from_directory(app.static_folder, 'index.html')
+	print("does this even work?")
+	return send_from_directory(app.static_folder, 'index.html')
 
 @app.route("/", methods=["GET"])
 def indexHtml():
