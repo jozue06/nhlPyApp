@@ -6,4 +6,4 @@
 
 #
 
-### The first command to enter is `-H` or `-h`. this will give you the help menu and all of the options to search with.
+### The first command to enter is `-H` or `-h`. This will give you the help menu and all of the options you can search with.
