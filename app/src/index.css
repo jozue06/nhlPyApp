@@ -3,13 +3,8 @@ body {
 	background: black;
 	font-size: 150%;
 	padding: 3rem;
-	
 }
   
-h6 {
-	color: white;		
-}
-
 textarea {
 	caret-color: green !important;
 	color: green !important;
@@ -18,10 +13,22 @@ textarea {
 	resize: none;
 }
 
+h6 {
+	color: white;		
+}
+
+
 textarea:focus-visible {
 	outline: -webkit-focus-ring-color none !important;
 }
 
 .input-wrapper {
 	margin-left: 80px;
+}
+ul {
+	list-style-type: none !important;
+}
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
