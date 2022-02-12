@@ -1,0 +1,27 @@
+
+body {
+	background: black;
+	font-size: 150%;
+	padding: 3rem;
+}
+  
+textarea {
+	caret-color: green !important;
+	color: green !important;
+	background-color: black; 
+	border: 1px solid white !important;	
+	resize: none;
+}
+
+textarea:focus-visible {
+	outline: -webkit-focus-ring-color none !important;
+}
+
+.input-wrapper {
+	margin-left: 80px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

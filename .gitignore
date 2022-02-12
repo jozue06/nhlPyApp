@@ -22,3 +22,4 @@ venv.bak/
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
+./app/node_modules
