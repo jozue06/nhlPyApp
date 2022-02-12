@@ -20,7 +20,9 @@ textarea:focus-visible {
 .input-wrapper {
 	margin-left: 80px;
 }
-
+ul {
+	list-style-type: none !important;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
