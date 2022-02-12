@@ -3,8 +3,13 @@ body {
 	background: black;
 	font-size: 150%;
 	padding: 3rem;
+	
 }
   
+h1 {
+	color: white;		
+}
+
 textarea {
 	caret-color: green !important;
 	color: green !important;

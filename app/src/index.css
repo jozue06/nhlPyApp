@@ -13,6 +13,11 @@ textarea {
 	resize: none;
 }
 
+h1 {
+	color: white;		
+}
+
+
 textarea:focus-visible {
 	outline: -webkit-focus-ring-color none !important;
 }
