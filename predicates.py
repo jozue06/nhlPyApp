@@ -6,9 +6,7 @@ def filterOne(useCountryCode, p, countriesToSearchFor):
 	return False
 
 def filterTwo(useRankFilter, p, rankFilter, useNegRankFilter):	
-
-	if useRankFilter == False or ('finalrank' in p['ranks'] and \
-		int(p['finalrank']['midterm']) <= int(rankFilter)) if useNegRankFilter else \
+	if useRankFilter == False and useNegRankFilter == False or \
 			('finalrank' in p['ranks'] and \
 				int(p['finalrank']['midterm']) >= int(rankFilter)) or ('midterm' in p['ranks'] and \
 				int(p['ranks']['midterm']) <= int(rankFilter)) if useNegRankFilter else \
