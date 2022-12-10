@@ -8,6 +8,15 @@ export class Form extends React.Component {
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.onKeyPress = this.onKeyPress.bind(this);
+
+	}
+
+	onKeyPress(event){
+		if(event.which === 13){
+			this.handleSubmit(event)
+			event.preventDefault();
+		}
 	}
 
 	handleChange(event) {
@@ -15,6 +24,7 @@ export class Form extends React.Component {
 	}
 
 	async handleSubmit(event) {
+		console.log("handle submit", )
 		this.setState({ loading: true });
 		event.preventDefault();
 		try {
@@ -22,7 +32,6 @@ export class Form extends React.Component {
 			this.setState({ data: results.data })
 			this.setState({ loading: false });
 		} catch (error) {
-			console.log('err?? ', error);
 			this.setState({ loading: false });
 		}
 	}
@@ -33,8 +42,10 @@ export class Form extends React.Component {
 				<h6>This is the React.js version of the NHL Prospect Terminal App</h6>
 				<form onSubmit={this.handleSubmit}>
 					<textarea 
+						id="textareainput"
 						value={this.state.value} 
 						onChange={this.handleChange} 
+						onKeyPress={this.onKeyPress}
 						name="queryString" 
 						className="terminal" 
 						autoFocus={true} 
@@ -42,15 +53,13 @@ export class Form extends React.Component {
 						cols="100" 
 					/>
 					{this.state.loading ?
-					<input 
+					<button 
 						type="submit" 
-						value="Submit" 
 						disabled={true}
-					/> : 
-					<input 
+					>submit</button> : 
+					<button 
 						type="submit" 
-						value="Submit" 
-					/>}
+					>submit</button>}
 				</form>
 
 				<div style={{color: 'aqua'}}>
