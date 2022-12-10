@@ -24,11 +24,10 @@ export class Form extends React.Component {
 	}
 
 	async handleSubmit(event) {
-		console.log("handle submit", )
 		this.setState({ loading: true });
 		event.preventDefault();
 		try {
-			const results = await axios.post("https://nhl-terminal.herokuapp.com/api/json/search", { queryString: this.state.value })
+			const results = await axios.post("http://127.0.0.1:5000/api/json/search", { queryString: this.state.value })
 			this.setState({ data: results.data })
 			this.setState({ loading: false });
 		} catch (error) {

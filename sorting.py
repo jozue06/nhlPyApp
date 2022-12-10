@@ -1,5 +1,4 @@
 def sort(list, filterName):
-	print("tip of filter name", filterName)
 	newList = []
 	if filterName == "-NAME":
 		newlist = sorted(list, key=lambda x: x.fullName)
@@ -20,7 +19,6 @@ def sort(list, filterName):
 	if filterName == "-LEAGUES":
 		newlist = sorted(list, key=lambda x: x.amateurLeague['name'])
 	if filterName == "-RANK":
-		print("here")
 		newlist = sorted(list, key=lambda x: x.ranks['midterm'])
 		
 	return newlist
