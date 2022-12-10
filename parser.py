@@ -301,7 +301,8 @@ def processIntoJSON(queryString):
 	if useRankFilter:
 		printOnlyRanked = True
 		filterNameForSorting = "-RANK"
-
+	if printOnlyRanked:
+		filterNameForSorting = "-RANK"
 	printOnlyEligable = '-ELIG' in queryString
 
 	usePositionFilter = '-POS' in queryString
