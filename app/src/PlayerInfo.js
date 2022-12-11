@@ -6,7 +6,9 @@ export default function PlayerName(props) {
 	const getInfo = async () => {
 		const data = await fetch(href);
 		const json = await data.json();
-		const id = json[0].id
+		
+		const found = json.length == 1 ? json[0] : json.find((e) => e.fullname == pName)
+		const id = found.id
 
 		const iframe = document.createElement('iframe');
 		iframe.src = `https://www.eliteprospects.com/ajax/player.stats.default?playerId=${id}`;
@@ -24,14 +26,14 @@ export default function PlayerName(props) {
 			const name = props.playerData.split(":")[1];
 			const linkName = name.replace("%20", "+");
 			setHref(`https://autocomplete.eliteprospects.com/all?q=${linkName}`);
-			setPName(name);
+			setPName(name.trim());
 			return (<>
-				{name}
+				{props.playerData}
 				<button onClick={() => getInfo()}>
 					Get Info
 				</button>
 				<>
-					<div id={`infos${name}`}>
+					<div id={`infos${pName}`}>
 					</div>
 				</>
 			</>);
