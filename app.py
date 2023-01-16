@@ -1,4 +1,4 @@
-from queryParser import processIntoHtml, processIntoJSON
+from queryParser import processIntoHtml
 from flask import Flask, render_template, send_from_directory, request, Response
 
 import json
@@ -22,7 +22,7 @@ def searchHtml():
 @app.route("/api/json/search", methods=["POST"])
 def searchJson():
 	queryString = request.get_json(force=True).get("queryString")
-	results = processIntoJSON(queryString)
+	results = processIntoHtml(queryString)
 
 	return Response(json.dumps(results))
 
