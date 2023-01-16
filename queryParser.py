@@ -69,6 +69,8 @@ def processIntoHtml(queryString):
 	useWeightFilter = int(weightFilter) > 0
 
 	printOnlyRanked = '-RANKED' in queryString
+	if printOnlyRanked:
+		filterNameForSorting = "-RANK"
 
 	useNegRankFilter = '-MAX-RANK' in queryString
 	usePlusRankFilter = '-MIN-RANK' in queryString
@@ -89,7 +91,11 @@ def processIntoHtml(queryString):
 	printOnlyEligable = '-ELIG' in queryString
 
 	usePositionFilter = '-POS' in queryString
-	positionFilter = queryString[queryString.index('-POS')+1][0] if usePositionFilter else "";
+	positionFilter = queryString[queryString.index('-POS')+1] if usePositionFilter else [];
+	if (positionFilter[0].upper() == "F"):
+		positionFilter[0] = "RW"
+		positionFilter.append("C")
+		positionFilter.append("LW")
 
 	useHandFilter = '-HAND' in queryString
 	handFilter = queryString[queryString.index('-HAND')+1][0] if useHandFilter else "";

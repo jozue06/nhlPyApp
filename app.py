@@ -1,4 +1,4 @@
-from parser import processIntoHtml, processIntoJSON
+from queryParser import processIntoHtml, processIntoJSON
 from flask import Flask, render_template, send_from_directory, request, Response
 
 import json

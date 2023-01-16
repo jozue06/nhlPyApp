@@ -20,7 +20,7 @@ def filterThree(printOnlyEligable, p):
 	return False
 
 def filterFour(usePositionFilter, positionFilter, p):
-	if (usePositionFilter == False or (positionFilter in p['primaryPosition']['abbreviation'])):
+	if (usePositionFilter == False or (p['primaryPosition']['abbreviation'] in positionFilter)):
 		return True
 	return False
 
