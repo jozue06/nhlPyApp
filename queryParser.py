@@ -92,7 +92,7 @@ def processIntoHtml(queryString):
 
 	usePositionFilter = '-POS' in queryString
 	positionFilter = queryString[queryString.index('-POS')+1] if usePositionFilter else [];
-	if (positionFilter[0].upper() == "F"):
+	if (usePositionFilter and positionFilter[0].upper() == "F"):
 		positionFilter[0] = "RW"
 		positionFilter.append("C")
 		positionFilter.append("LW")
