@@ -6,9 +6,32 @@
 				<input type="submit">
 			</form>
 		</div>
+		{% if results %}
+			{% set total_players = [] %}
+			{% for res in results %}
+				{% if res and 'Player Full Name:' in res %}
+					{% set _ = total_players.append(1) %}
+				{% endif %}
+			{% endfor %}
+			{% if total_players | length > 0 %}
+				<div style="color: #00ff00; padding: 10px; margin: 10px 0; font-weight: bold; text-align: center;">
+					Total Players Found: {{ total_players | length }}
+				</div>
+			{% endif %}
+		{% endif %}
 		{% for res in results %}
-			<p style="color: aqua !important;">
-				{{ res }}
-			</p>
+			{% if res and 'Player Headshot:' in res and 'http' in res %}
+				{% set headshot_url = res.split('Player Headshot: ')[1] %}
+				<div style="display: flex; justify-content: center; margin: 10px 0;">
+					<img src="{{ headshot_url }}" 
+						 alt="Player headshot" 
+						 style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px; border: 2px solid #00ff00;"
+						 onerror="this.style.display='none';">
+				</div>
+			{% elif res and 'Player Headshot:' not in res %}
+				<p style="color: aqua !important;">
+					{{ res }}
+				</p>
+			{% endif %}
 		{% endfor %}
 	{% endblock %}

@@ -7,6 +7,11 @@ def processPlayers(playerList, stringListResults):
 		stringListResults.append(topline)
 		stringListResults.append("Player NHL ID: " + str(p.id))
 		stringListResults.append("Player Full Name: " + p.fullName)
+		# Add headshot URL if available
+		if hasattr(p, 'headshot') and p.headshot:
+			stringListResults.append("Player Headshot: " + p.headshot)
+		else:
+			stringListResults.append("Player Headshot: N/A")
 		stringListResults.append("Player Birth Date: " + p.birthDate)
 		stringListResults.append("Player Current Age: " + str(calculateAge(p.birthDate)))
 		if p.height:

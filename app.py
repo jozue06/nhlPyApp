@@ -1,9 +1,12 @@
 from queryParser import processIntoHtml
 from flask import Flask, render_template, send_from_directory, request, Response
+from flask_cors import CORS
 
 import json
 app = Flask(__name__, static_url_path='', static_folder='app/build')
 
+# Enable CORS for all domains on all routes
+CORS(app)
 
 @app.route("/react", methods=["GET"])
 def indexReact():

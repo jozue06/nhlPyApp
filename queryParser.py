@@ -39,6 +39,7 @@ def convert_api_response_to_old_format(player_data):
 		'height': f"{player_data.get('heightInInches', 0) // 12}'{player_data.get('heightInInches', 0) % 12}\"" if player_data.get('heightInInches') else None,
 		'weight': player_data.get('weightInPounds'),
 		'birthCountry': player_data.get('birthCountry', ''),
+		'headshot': player_data.get('headshot', ''),  # Add headshot URL
 		'primaryPosition': {
 			'name': {
 				'C': 'Center',

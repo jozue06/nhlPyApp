@@ -22,7 +22,25 @@ export default function PlayerName(props) {
 
 	};
 	const getName = useMemo(() => {
-		if (props?.playerData.includes("Player Full Name")) {
+		if (props?.playerData.includes("Player Headshot:") && props?.playerData.includes("http")) {
+			const headshotUrl = props.playerData.split("Player Headshot: ")[1];
+			return (
+				<div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
+					<img 
+						src={headshotUrl} 
+						alt="Player headshot" 
+						style={{ 
+							width: '100px', 
+							height: '100px', 
+							objectFit: 'cover',
+							borderRadius: '5px',
+							border: '2px solid #00ff00'
+						}}
+						onError={(e) => { e.target.style.display = 'none'; }}
+					/>
+				</div>
+			);
+		} else if (props?.playerData.includes("Player Full Name")) {
 			const name = props.playerData.split(":")[1];
 			const linkName = name.replace("%20", "+");
 			setHref(`https://autocomplete.eliteprospects.com/all?q=${linkName}`);
@@ -50,4 +68,4 @@ export default function PlayerName(props) {
 			{getName}
 		</>
 	);
-  }
+}
