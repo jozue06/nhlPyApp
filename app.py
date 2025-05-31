@@ -26,7 +26,6 @@ def searchHtml():
 def searchJson():
 	queryString = request.get_json(force=True).get("queryString")
 	results = processIntoHtml(queryString)
-
 	return Response(json.dumps(results))
 
 if __name__ == '__main__':

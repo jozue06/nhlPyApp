@@ -68,6 +68,9 @@ def processIntoHtml(queryString):
 	useCountryCode = '-CODES' in queryString
 	countriesToSearchFor = queryString[queryString.index('-CODES')+1] if useCountryCode else []
 
+	useExcludeCountryCode = '-EXCLUDE-CODES' in queryString
+	countriesToExclude = queryString[queryString.index('-EXCLUDE-CODES')+1] if useExcludeCountryCode else []
+
 	useNegHeightFilter = '-HEIGHT' in queryString
 	usePlusHeightFilter = '+HEIGHT' in queryString
 	heightFilter = ""
@@ -153,6 +156,7 @@ def processIntoHtml(queryString):
 		results.append("To Show Draft Eligable Players Only add -ELIG")
 		results.append("\n")
 		results.append("To Use the Country Code Filter add -CODES followed directly by \"codeOne,codeTwo\"")
+		results.append("To Exclude Country Codes add -EXCLUDE-CODES followed directly by \"codeOne,codeTwo\"")
 		results.append("To Use the League Filter add -LEAGUES followed directly by \"league one name,league two name\"")
 		results.append("To Use the Team Filter add -TEAMS followed directly by \"team one name,team two name\"")
 		results.append("To Use the Position Filter add -POS followed directly by \"c\" or \"g\" (c for center, g for goalie etc.)")
@@ -175,6 +179,7 @@ def processIntoHtml(queryString):
 		results.append("*********************************************************************")
 		results.append("\n")
 	elif (useCountryCode or \
+		useExcludeCountryCode or \
 		useNegHeightFilter or \
 		usePlusHeightFilter or \
 		useNegAgeFilter or \
@@ -194,6 +199,9 @@ def processIntoHtml(queryString):
 
 		if len(countriesToSearchFor) > 0:
 			results.append("Searching Birth Country Codes: " + str(countriesToSearchFor))
+
+		if len(countriesToExclude) > 0:
+			results.append("Excluding Birth Country Codes: " + str(countriesToExclude))
 
 		results.append("Print Only Ranked Players: " + str(printOnlyRanked))
 		results.append("Print Only Draft Eligable Players: " + str(printOnlyEligable))
@@ -266,6 +274,8 @@ def processIntoHtml(queryString):
 				p,  
 				useCountryCode, 
 				countriesToSearchFor,
+				useExcludeCountryCode,
+				countriesToExclude,
 				useRankFilter, 
 				rankFilter, 
 				useNegRankFilter,

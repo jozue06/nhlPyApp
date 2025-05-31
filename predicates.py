@@ -1,6 +1,11 @@
 from utils import convert_height, calculateAge
 
-def filterOne(useCountryCode, p, countriesToSearchFor):
+def filterOne(useCountryCode, p, countriesToSearchFor, useExcludeCountryCode=False, countriesToExclude=[]):
+	# First check exclusions - if player's country is in exclude list, filter them out
+	if useExcludeCountryCode and 'birthCountry' in p and p['birthCountry'] in countriesToExclude:
+		return False
+	
+	# Then check inclusions - if inclusion filter is active, only include specified countries
 	if useCountryCode == False or ('birthCountry' in p and p['birthCountry'] in countriesToSearchFor):
 		return True
 	return False
@@ -105,6 +110,8 @@ def filterTen(useTeamFilter, p, teamsFilter):
 def all(p, 
 		useCountryCode, 
 		countriesToSearchFor,
+		useExcludeCountryCode,
+		countriesToExclude,
 		useRankFilter, 
 		rankFilter, 
 		useNegRankFilter,
@@ -126,7 +133,7 @@ def all(p,
 		leaguesFilter,
 		useTeamFilter, 
 		teamsFilter):
-			return filterOne(useCountryCode, p, countriesToSearchFor) and \
+			return filterOne(useCountryCode, p, countriesToSearchFor, useExcludeCountryCode, countriesToExclude) and \
 				filterTwo(useRankFilter, p, rankFilter, useNegRankFilter) and \
 				filterThree(printOnlyEligable, p) and \
 				filterFour(usePositionFilter, positionFilter, p) and \

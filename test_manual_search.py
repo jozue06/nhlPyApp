@@ -18,6 +18,8 @@ def manual_goalie_search():
     # Other filters (all false for this test)
     useCountryCode = False
     countriesToSearchFor = []
+    useExcludeCountryCode = False
+    countriesToExclude = []
     useRankFilter = False
     rankFilter = 0
     useNegRankFilter = False
@@ -64,6 +66,8 @@ def manual_goalie_search():
                         p,  
                         useCountryCode, 
                         countriesToSearchFor,
+                        useExcludeCountryCode,
+                        countriesToExclude,
                         useRankFilter, 
                         rankFilter, 
                         useNegRankFilter,

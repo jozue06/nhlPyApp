@@ -99,6 +99,22 @@ def test_country_filter():
     
     return results
 
+def test_country_exclude_filter():
+    """Test country code exclusion filter"""
+    tests = [
+        ("Exclude USA Players", "-EXCLUDE-CODES \"USA\"", "Should show all players except USA-born"),
+        ("Exclude Canada Players", "-EXCLUDE-CODES \"CAN\"", "Should show all players except Canada-born"),
+        ("Exclude Multiple Countries", "-EXCLUDE-CODES \"USA,CAN\"", "Should exclude both USA and Canada-born players"),
+        ("Exclude Sweden Players", "-EXCLUDE-CODES \"SWE\"", "Should show all players except Sweden-born"),
+    ]
+    
+    results = []
+    for name, query, expected in tests:
+        success, count = run_test(name, query, expected)
+        results.append((name, success, count))
+    
+    return results
+
 def test_physical_filters():
     """Test height, weight, and age filters"""
     tests = [
@@ -180,6 +196,8 @@ def test_combined_filters():
         ("Tall Centers", "-POS C +HEIGHT \"6'2\"", "Should show centers 6'2\" and taller"),
         ("Young Left-handed Players", "-AGE \"20\" -HAND \"L\"", "Should show players 20 and under who are left-handed"),
         ("Canadian Defensemen", "-POS D -CODES \"CAN\"", "Should show only Canadian defensemen"),
+        ("Non-North American Goalies", "-POS G -EXCLUDE-CODES \"USA,CAN\"", "Should show goalies from outside USA and Canada"),
+        ("European Centers Only", "-POS C -CODES \"SWE,FIN,RUS\" -EXCLUDE-CODES \"USA,CAN\"", "Should show centers from specific European countries, excluding North America"),
     ]
     
     results = []
@@ -211,6 +229,7 @@ def main():
         ("Position Filters", test_position_filters),
         ("Draft Filters", test_draft_filters),
         ("Country Filters", test_country_filter),
+        ("Country Exclude Filters", test_country_exclude_filter),
         ("Physical Filters", test_physical_filters),
         ("Hand Filters", test_hand_filter),
         ("Rank Filters", test_rank_filters),

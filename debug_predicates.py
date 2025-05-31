@@ -29,6 +29,8 @@ def debug_predicates():
             # Set up the same parameters as the failing test
             useCountryCode = False
             countriesToSearchFor = []
+            useExcludeCountryCode = False
+            countriesToExclude = []
             useRankFilter = False
             rankFilter = 0
             useNegRankFilter = False
@@ -51,7 +53,7 @@ def debug_predicates():
             teamsFilter = []
             
             # Test each filter
-            print(f"1. filterOne (country): {predicates.filterOne(useCountryCode, goalie, countriesToSearchFor)}")
+            print(f"1. filterOne (country): {predicates.filterOne(useCountryCode, goalie, countriesToSearchFor, useExcludeCountryCode, countriesToExclude)}")
             print(f"2. filterTwo (rank): {predicates.filterTwo(useRankFilter, goalie, rankFilter, useNegRankFilter)}")
             print(f"3. filterThree (eligibility): {predicates.filterThree(printOnlyEligable, goalie)}")
             print(f"4. filterFour (position): {predicates.filterFour(usePositionFilter, positionFilter, goalie)}")
@@ -67,6 +69,8 @@ def debug_predicates():
                 goalie,  
                 useCountryCode, 
                 countriesToSearchFor,
+                useExcludeCountryCode,
+                countriesToExclude,
                 useRankFilter, 
                 rankFilter, 
                 useNegRankFilter,

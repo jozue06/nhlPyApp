@@ -107,6 +107,15 @@ npm start
 
 # Multiple countries
 -CODES "USA,CAN,SWE"
+
+# Exclude USA players (show all except USA)
+-EXCLUDE-CODES "USA"
+
+# Exclude multiple countries
+-EXCLUDE-CODES "USA,CAN"
+
+# Combine include and exclude (European players only)
+-CODES "SWE,FIN,RUS" -EXCLUDE-CODES "USA,CAN"
 ```
 
 ### **Physical Attribute Searches**
@@ -140,6 +149,9 @@ npm start
 
 # Left-handed defensemen from Sweden
 -POS D -CODES "SWE" -HAND "L"
+
+# Non-North American goalies
+-POS G -EXCLUDE-CODES "USA,CAN"
 ```
 
 ### **Individual Player Lookup**
