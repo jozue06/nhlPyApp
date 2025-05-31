@@ -63,11 +63,7 @@ export class Form extends React.Component {
         </form>
 
         <div style={{ color: "aqua" }}>
-          {this.state.data ? (
-            <ResultList results={this.state.data} />
-          ) : (
-            <h1></h1>
-          )}
+          {this.state.data && <ResultList results={this.state.data} />}
         </div>
       </div>
     );
