@@ -47,10 +47,6 @@ def debug_predicates():
             useAgeFilter = False
             ageFilter = 0
             useNegAgeFilter = False
-            useLeagueFilter = False
-            leaguesFilter = []
-            useTeamFilter = False
-            teamsFilter = []
             
             # Test each filter
             print(f"1. filterOne (country): {predicates.filterOne(useCountryCode, goalie, countriesToSearchFor, useExcludeCountryCode, countriesToExclude)}")
@@ -61,8 +57,6 @@ def debug_predicates():
             print(f"6. filterSix (height): {predicates.filterSix(useHeightFilter, goalie, heightFilter, useNegHeightFilter)}")
             print(f"7. filterSeven (weight): {predicates.filterSeven(useNegWeightFilter, goalie, weightFilter, useNegWeightFilter)}")
             print(f"8. filterEight (age): {predicates.filterEight(useAgeFilter, goalie, ageFilter, useNegAgeFilter)}")
-            print(f"9. filterNine (league): {predicates.filterNine(useLeagueFilter, goalie, leaguesFilter)}")
-            print(f"10. filterTen (team): {predicates.filterTen(useTeamFilter, goalie, teamsFilter)}")
             
             # Test the combined function
             all_result = predicates.all(
@@ -86,11 +80,7 @@ def debug_predicates():
                 useNegWeightFilter,
                 useAgeFilter, 
                 ageFilter, 
-                useNegAgeFilter,
-                useLeagueFilter,
-                leaguesFilter,
-                useTeamFilter, 
-                teamsFilter
+                useNegAgeFilter
             )
             
             print(f"\nCombined result: {all_result}")

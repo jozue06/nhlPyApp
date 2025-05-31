@@ -39,10 +39,6 @@ def processPlayers(playerList, stringListResults):
 			else:
 				stringListResults.append("Player Shot Hand: N/A")
 		stringListResults.append("Player Draft Eligibility: " + p.draftStatus)
-		if 'name' in p.amateurTeam and p.amateurTeam:
-			stringListResults.append("Player Amateur Team: " + p.amateurTeam['name'])
-		if 'name' in p.amateurLeague and p.amateurLeague:
-			stringListResults.append("Player Amateur League: " + p.amateurLeague['name'])
 		
 		# Always show ranking information
 		if hasattr(p, 'ranks') and p.ranks:

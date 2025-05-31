@@ -161,20 +161,6 @@ def test_rank_filters():
     
     return results
 
-def test_team_league_filters():
-    """Test team and league filters (note: these may not work due to API limitations)"""
-    tests = [
-        ("Specific Team", "-TEAMS \"Toronto Marlboros\"", "Should show players from specific amateur team (may not work with new API)"),
-        ("Specific League", "-LEAGUES \"OHL\"", "Should show players from specific amateur league (may not work with new API)"),
-    ]
-    
-    results = []
-    for name, query, expected in tests:
-        success, count = run_test(name, query, expected)
-        results.append((name, success, count))
-    
-    return results
-
 def test_id_filter():
     """Test individual player ID lookup"""
     tests = [
@@ -233,7 +219,6 @@ def main():
         ("Physical Filters", test_physical_filters),
         ("Hand Filters", test_hand_filter),
         ("Rank Filters", test_rank_filters),
-        ("Team/League Filters", test_team_league_filters),
         ("ID Filters", test_id_filter),
         ("Combined Filters", test_combined_filters),
     ]

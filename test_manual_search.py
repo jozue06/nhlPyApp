@@ -34,10 +34,6 @@ def manual_goalie_search():
     useAgeFilter = False
     ageFilter = 0
     useNegAgeFilter = False
-    useLeagueFilter = False
-    leaguesFilter = []
-    useTeamFilter = False
-    teamsFilter = []
     
     playerList = []
     
@@ -83,11 +79,7 @@ def manual_goalie_search():
                         useNegWeightFilter,
                         useAgeFilter, 
                         ageFilter, 
-                        useNegAgeFilter,
-                        useLeagueFilter,
-                        leaguesFilter,
-                        useTeamFilter, 
-                        teamsFilter):
+                        useNegAgeFilter):
                             newPlayer = Player(p=p)
                             playerList.append(newPlayer)
                             team_filtered.append(p['fullName'])

@@ -93,20 +93,6 @@ def filterEight(useAgeFilter, p, ageFilter, useNegAgeFilter):
 	else:
 		return player_age >= filter_age
 
-def filterNine(useLeagueFilter, p, leaguesFilter):
-	if useLeagueFilter == False or ('amateurLeague' in p and \
-		'name' in p['amateurLeague'] and \
-		p['amateurLeague']['name'] in leaguesFilter):
-		return True
-	return False
-
-def filterTen(useTeamFilter, p, teamsFilter):
-	if useTeamFilter == False or ('amateurTeam' in p and \
-			'name' in p['amateurTeam'] and \
-			p['amateurTeam']['name'] in teamsFilter):
-		return True
-	return False
-
 def all(p, 
 		useCountryCode, 
 		countriesToSearchFor,
@@ -128,11 +114,7 @@ def all(p,
 		useNegWeightFilter,
 		useAgeFilter, 
 		ageFilter, 
-		useNegAgeFilter,
-		useLeagueFilter,
-		leaguesFilter,
-		useTeamFilter, 
-		teamsFilter):
+		useNegAgeFilter):
 			return filterOne(useCountryCode, p, countriesToSearchFor, useExcludeCountryCode, countriesToExclude) and \
 				filterTwo(useRankFilter, p, rankFilter, useNegRankFilter) and \
 				filterThree(printOnlyEligable, p) and \
@@ -140,6 +122,4 @@ def all(p,
 				filterFive(useHandFilter, p, handFilter) and \
 				filterSix(useHeightFilter, p, heightFilter, useNegHeightFilter) and \
 				filterSeven(useWeightFilter, p, weightFilter, useNegWeightFilter) and \
-				filterEight(useAgeFilter, p, ageFilter, useNegAgeFilter) and \
-				filterNine(useLeagueFilter, p, leaguesFilter) and \
-				filterTen(useTeamFilter, p, teamsFilter)
+				filterEight(useAgeFilter, p, ageFilter, useNegAgeFilter)

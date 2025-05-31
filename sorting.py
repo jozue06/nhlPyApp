@@ -16,10 +16,6 @@ def sort(list, filterName):
 		newlist = sorted(list, key=lambda x: x.weight, reverse=True)
 	if filterName == "+WEIGHT":
 		newlist = sorted(list, key=lambda x: x.weight)
-	if filterName == "-TEAMS":
-		newlist = sorted(list, key=lambda x: x.amateurTeam.get('name', '') if hasattr(x, 'amateurTeam') and x.amateurTeam else '')
-	if filterName == "-LEAGUES":
-		newlist = sorted(list, key=lambda x: x.amateurLeague.get('name', '') if hasattr(x, 'amateurLeague') and x.amateurLeague else '')
 	if filterName == "-RANK" or filterName == "-MAX-RANK" or filterName == "-MIN-RANK":
 		# Handle ranking sorts - if no ranking data available, sort by name
 		def get_rank(player):

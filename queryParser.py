@@ -52,8 +52,6 @@ def convert_api_response_to_old_format(player_data):
 		},
 		'shootsCatches': player_data.get('shootsCatches', ''),
 		'draftStatus': 'Eligible',  # Default since new API doesn't provide this
-		'amateurTeam': {},  # Not provided in new API
-		'amateurLeague': {},  # Not provided in new API
 		'ranks': {}  # Not provided in new API
 	}
 	return converted
@@ -137,16 +135,6 @@ def processIntoHtml(queryString):
 	useHandFilter = '-HAND' in queryString
 	handFilter = queryString[queryString.index('-HAND')+1][0] if useHandFilter else "";
 
-	useLeagueFilter = '-LEAGUES' in queryString
-	leaguesFilter = queryString[queryString.index('-LEAGUES')+1] if useLeagueFilter else [];
-
-	if useLeagueFilter:
-		filterNameForSorting = "-LEAGUES"
-
-	useTeamFilter = '-TEAMS' in queryString
-	teamsFilter = queryString[queryString.index('-TEAMS')+1] if useTeamFilter else [];
-	if useTeamFilter:
-		filterNameForSorting = "-TEAMS"
 	playerList = []
 	if "-H" in queryString or "-h" in queryString:
 		results.append("\n")
@@ -157,8 +145,6 @@ def processIntoHtml(queryString):
 		results.append("\n")
 		results.append("To Use the Country Code Filter add -CODES followed directly by \"codeOne,codeTwo\"")
 		results.append("To Exclude Country Codes add -EXCLUDE-CODES followed directly by \"codeOne,codeTwo\"")
-		results.append("To Use the League Filter add -LEAGUES followed directly by \"league one name,league two name\"")
-		results.append("To Use the Team Filter add -TEAMS followed directly by \"team one name,team two name\"")
 		results.append("To Use the Position Filter add -POS followed directly by \"c\" or \"g\" (c for center, g for goalie etc.)")
 		results.append("To Use the Hand Filter add -HAND followed directly by \"l\" or \"r\"")
 		results.append("\n")
@@ -192,9 +178,7 @@ def processIntoHtml(queryString):
 		useRankFilter or \
 		printOnlyEligable or \
 		usePositionFilter or \
-		useHandFilter or \
-		useLeagueFilter or \
-		useTeamFilter) and not useIdFilter:
+		useHandFilter) and not useIdFilter:
 		results.append("\n")
 
 		if len(countriesToSearchFor) > 0:
@@ -231,12 +215,6 @@ def processIntoHtml(queryString):
 
 		if useRankFilter:
 			results.append("Using Rank Filter: " + rankFilterEquality + " " + str(rankFilter))
-
-		if len(leaguesFilter) > 0:
-			results.append("Using Leagues Filter: " + str(leaguesFilter))
-
-		if len(teamsFilter) > 0:
-			results.append("Using Leagues Filter: " + str(teamsFilter))
 
 		# Loop through all NHL teams to get prospects
 		all_prospects = []
@@ -292,11 +270,7 @@ def processIntoHtml(queryString):
 				useNegWeightFilter,
 				useAgeFilter, 
 				ageFilter, 
-				useNegAgeFilter,
-				useLeagueFilter,
-				leaguesFilter,
-				useTeamFilter, 
-				teamsFilter):
+				useNegAgeFilter):
 					newPlayer = Player(p=p)
 					playerList.append(newPlayer)
 		processPlayers(sort(playerList, filterName=filterNameForSorting), results)		

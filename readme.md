@@ -7,10 +7,10 @@ A comprehensive Python application for exploring NHL prospect data, featuring bo
 ### 🔍 **Advanced Filtering System**
 - **Position Filters**: Search by specific positions (C, L, R, D, G) or all forwards
 - **Country Filters**: Filter by birth country using country codes (USA, CAN, SWE, etc.)
+- **Country Exclusion**: Exclude specific countries from search results
 - **Physical Filters**: Search by height, weight, and age ranges
 - **Hand Preference**: Filter by shooting/catching hand (L/R)
 - **Rank Filters**: Search by draft rankings (when available)
-- **Team/League Filters**: Filter by amateur teams and leagues (when available)
 - **Combined Filters**: Mix and match any filters for precise searches
 
 ### 📊 **Data Coverage**
@@ -220,6 +220,7 @@ python3 -c "from queryParser import processIntoHtml; print(processIntoHtml('-POS
 ### **🔄 API Limitations**
 - **Draft Rankings**: Not available in new API (shows all players)
 - **Amateur Teams/Leagues**: Not provided in new API structure
+- **Current League Info**: No information about what league players currently play in
 - **Height Filtering**: May show limited results due to data format
 
 ## 🤝 Contributing
