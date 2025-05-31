@@ -1,25 +1,72 @@
-__pycache__/
-*.py[cod]
-*$py.class
-*.manifest
-*.spec
-pip-log.txt
-pip-delete-this-directory.txt
-instance/
-.venv
-env/
+# Dependencies
+.venv/
 venv/
-ENV/
-env.bak/
-venv.bak/
+app/node_modules/
+
+# IDE - Include workspace settings but exclude user-specific files
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/extensions.json
+.vscode/.ropeproject
+.idea/
+
+# OS
 .DS_Store
-.AppleDouble
-.LSOverride
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-./app/node_modules
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# React build
+app/build/
+app/dist/
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Temporary files
+*.tmp
+*.temp

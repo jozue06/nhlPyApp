@@ -59,14 +59,22 @@
 					const errorMsg = infoDiv.querySelector('p');
 					
 					if (state.visible) {
-						if (iframe) iframe.style.display = 'none';
-						if (errorMsg) errorMsg.style.display = 'none';
+						if (iframe) {
+							iframe.style.display = 'none';
+						}
+						if (errorMsg) {
+							errorMsg.style.display = 'none';
+						}
 						state.visible = false;
 						button.textContent = 'Show Info';
 						button.style.backgroundColor = '#4ecdc4';
 					} else {
-						if (iframe) iframe.style.display = 'block';
-						if (errorMsg) errorMsg.style.display = 'block';
+						if (iframe) {
+							iframe.style.display = 'block';
+						}
+						if (errorMsg) {
+							errorMsg.style.display = 'block';
+						}
 						state.visible = true;
 						button.textContent = 'Hide Info';
 						button.style.backgroundColor = '#ff6b6b';
