@@ -38,8 +38,20 @@ def processPlayers(playerList, stringListResults):
 			stringListResults.append("Player Amateur Team: " + p.amateurTeam['name'])
 		if 'name' in p.amateurLeague and p.amateurLeague:
 			stringListResults.append("Player Amateur League: " + p.amateurLeague['name'])
-		if 'midterm' in p.ranks:
-			stringListResults.append("Player midterm Rank: " + str(p.ranks['midterm']))
-		if 'finalrank' in p.ranks:
-			stringListResults.append("Player finalrank Rank: " + str(p.ranks['finalrank']))	
+		
+		# Always show ranking information
+		if hasattr(p, 'ranks') and p.ranks:
+			if 'midterm' in p.ranks:
+				stringListResults.append("Player Midterm Rank: " + str(p.ranks['midterm']))
+			else:
+				stringListResults.append("Player Midterm Rank: not currently ranked")
+			
+			if 'finalrank' in p.ranks:
+				stringListResults.append("Player Final Rank: " + str(p.ranks['finalrank']))
+			else:
+				stringListResults.append("Player Final Rank: not currently ranked")
+		else:
+			stringListResults.append("Player Midterm Rank: not currently ranked")
+			stringListResults.append("Player Final Rank: not currently ranked")
+		
 		index += 1

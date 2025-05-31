@@ -4,6 +4,13 @@ import predicates
 from  processPlayers import processPlayers 
 from playerClass import Player
 
+# NHL team abbreviations for looping through all teams
+NHL_TEAMS = [
+	'ANA', 'BOS', 'BUF', 'CGY', 'CAR', 'CHI', 'COL', 'CBJ', 'DAL', 'DET',
+	'EDM', 'FLA', 'LAK', 'MIN', 'MTL', 'NSH', 'NJD', 'NYI', 'NYR', 'OTT',
+	'PHI', 'PIT', 'SJS', 'SEA', 'STL', 'TBL', 'TOR', 'UTA', 'VAN', 'VGK',
+	'WSH', 'WPG'
+]
 
 def processQueryString(queryString):
 	partsToReturn = []
@@ -23,6 +30,32 @@ def processQueryString(queryString):
 
 	return partsToReturn
 
+def convert_api_response_to_old_format(player_data):
+	"""Convert new API response format to match the old format expected by the rest of the code"""
+	converted = {
+		'id': player_data.get('id'),
+		'fullName': f"{player_data.get('firstName', {}).get('default', '')} {player_data.get('lastName', {}).get('default', '')}".strip(),
+		'birthDate': player_data.get('birthDate', ''),
+		'height': f"{player_data.get('heightInInches', 0) // 12}'{player_data.get('heightInInches', 0) % 12}\"" if player_data.get('heightInInches') else None,
+		'weight': player_data.get('weightInPounds'),
+		'birthCountry': player_data.get('birthCountry', ''),
+		'primaryPosition': {
+			'name': {
+				'C': 'Center',
+				'L': 'Left Wing', 
+				'R': 'Right Wing',
+				'D': 'Defenseman',
+				'G': 'Goalie'
+			}.get(player_data.get('positionCode', ''), player_data.get('positionCode', '')),
+			'abbreviation': player_data.get('positionCode', '')
+		},
+		'shootsCatches': player_data.get('shootsCatches', ''),
+		'draftStatus': 'Eligible',  # Default since new API doesn't provide this
+		'amateurTeam': {},  # Not provided in new API
+		'amateurLeague': {},  # Not provided in new API
+		'ranks': {}  # Not provided in new API
+	}
+	return converted
 
 def processIntoHtml(queryString):
 	results = []
@@ -36,29 +69,29 @@ def processIntoHtml(queryString):
 
 	useNegHeightFilter = '-HEIGHT' in queryString
 	usePlusHeightFilter = '+HEIGHT' in queryString
-	heightFilter = 0
+	heightFilter = ""
 	if useNegHeightFilter:
 		heightFilter = queryString[queryString.index('-HEIGHT')+1][0]
 		filterNameForSorting = "-HEIGHT"
 	elif usePlusHeightFilter:
 		heightFilter = queryString[queryString.index('+HEIGHT')+1][0]
 		filterNameForSorting = "+HEIGHT"
-	useHeightFilter = int(heightFilter) > 0
+	useHeightFilter = len(heightFilter) > 0
 
 	useNegAgeFilter = '-AGE' in queryString
 	usePlusAgeFilter = '+AGE' in queryString
-	ageFilter = 0
+	ageFilter = ""
 	if useNegAgeFilter:
 		ageFilter = queryString[queryString.index('-AGE')+1][0]
 		filterNameForSorting = "-AGE"
 	elif usePlusAgeFilter:
 		ageFilter = queryString[queryString.index('+AGE')+1][0]
 		filterNameForSorting = "+AGE"
-	useAgeFilter = int(ageFilter) > 0
+	useAgeFilter = len(ageFilter) > 0
 
 	useNegWeightFilter = '-WEIGHT' in queryString
 	usePlusWeightFilter = '+WEIGHT' in queryString
-	weightFilter = 0
+	weightFilter = ""
 	if useNegWeightFilter:
 		weightFilter = queryString[queryString.index('-WEIGHT')+1][0]
 		filterNameForSorting = "-WEIGHT"
@@ -66,7 +99,7 @@ def processIntoHtml(queryString):
 		weightFilter = queryString[queryString.index('+WEIGHT')+1][0]
 		filterNameForSorting = "+WEIGHT"
 
-	useWeightFilter = int(weightFilter) > 0
+	useWeightFilter = len(weightFilter) > 0
 
 	printOnlyRanked = '-RANKED' in queryString
 	if printOnlyRanked:
@@ -196,10 +229,38 @@ def processIntoHtml(queryString):
 		if len(teamsFilter) > 0:
 			results.append("Using Leagues Filter: " + str(teamsFilter))
 
-		response = requests.get("https://statsapi.web.nhl.com/api/v1/draft/prospects")
+		# Loop through all NHL teams to get prospects
+		all_prospects = []
+		for team_abbrev in NHL_TEAMS:
+			try:
+				response = requests.get(f"https://api-web.nhle.com/v1/prospects/{team_abbrev}")
+				if response.status_code == 200:
+					team_data = response.json()
+					
+					# Process forwards
+					if 'forwards' in team_data:
+						for player in team_data['forwards']:
+							converted_player = convert_api_response_to_old_format(player)
+							all_prospects.append(converted_player)
+					
+					# Process defensemen
+					if 'defensemen' in team_data:
+						for player in team_data['defensemen']:
+							converted_player = convert_api_response_to_old_format(player)
+							all_prospects.append(converted_player)
+					
+					# Process goalies
+					if 'goalies' in team_data:
+						for player in team_data['goalies']:
+							converted_player = convert_api_response_to_old_format(player)
+							all_prospects.append(converted_player)
+				else:
+					print(f"Warning: Failed to get prospects for team {team_abbrev}")
+			except Exception as e:
+				print(f"Error getting prospects for team {team_abbrev}: {e}")
 		
-		
-		for p in response.json()['prospects']:
+		# Filter prospects using existing logic
+		for p in all_prospects:
 			if predicates.all(
 				p,  
 				useCountryCode, 
@@ -215,6 +276,7 @@ def processIntoHtml(queryString):
 				useHeightFilter, 
 				heightFilter, 
 				useNegHeightFilter,
+				useWeightFilter,
 				weightFilter, 
 				useNegWeightFilter,
 				useAgeFilter, 
@@ -233,13 +295,72 @@ def processIntoHtml(queryString):
 		results.append("\n")
 		results.append("Using Player NHL ID Filter: " + nhlPlayerId)
 
-		response = requests.get("https://statsapi.web.nhl.com/api/v1/draft/prospects/" + nhlPlayerId)
+		# For individual player lookup, we need to search through all teams
+		found_player = None
+		for team_abbrev in NHL_TEAMS:
+			try:
+				response = requests.get(f"https://api-web.nhle.com/v1/prospects/{team_abbrev}")
+				if response.status_code == 200:
+					team_data = response.json()
+					
+					# Search in all position arrays
+					for position_group in ['forwards', 'defensemen', 'goalies']:
+						if position_group in team_data:
+							for player in team_data[position_group]:
+								if str(player.get('id')) == str(nhlPlayerId):
+									found_player = convert_api_response_to_old_format(player)
+									break
+					if found_player:
+						break
+			except Exception as e:
+				print(f"Error searching for player in team {team_abbrev}: {e}")
 
-		json = response.json()['prospects']
-		for p in json:
+		if found_player:
+			newPlayer = Player(p=found_player)
+			playerList.append(newPlayer)
+			processPlayers(playerList, results)
+		else:
+			results.append("Player not found with ID: " + nhlPlayerId)
+	else:
+		# No specific filters applied - show all prospects
+		results.append("\n")
+		results.append("Showing all prospects (no filters applied)")
+		
+		# Loop through all NHL teams to get prospects
+		all_prospects = []
+		for team_abbrev in NHL_TEAMS:
+			try:
+				response = requests.get(f"https://api-web.nhle.com/v1/prospects/{team_abbrev}")
+				if response.status_code == 200:
+					team_data = response.json()
+					
+					# Process forwards
+					if 'forwards' in team_data:
+						for player in team_data['forwards']:
+							converted_player = convert_api_response_to_old_format(player)
+							all_prospects.append(converted_player)
+					
+					# Process defensemen
+					if 'defensemen' in team_data:
+						for player in team_data['defensemen']:
+							converted_player = convert_api_response_to_old_format(player)
+							all_prospects.append(converted_player)
+					
+					# Process goalies
+					if 'goalies' in team_data:
+						for player in team_data['goalies']:
+							converted_player = convert_api_response_to_old_format(player)
+							all_prospects.append(converted_player)
+				else:
+					print(f"Warning: Failed to get prospects for team {team_abbrev}")
+			except Exception as e:
+				print(f"Error getting prospects for team {team_abbrev}: {e}")
+		
+		# Add all prospects without filtering
+		for p in all_prospects:
 			newPlayer = Player(p=p)
 			playerList.append(newPlayer)
-
-		processPlayers(playerList, results)
+		
+		processPlayers(sort(playerList, filterName=filterNameForSorting), results)
 
 	return results
