@@ -23,7 +23,7 @@ export default function PlayerName(props) {
         }
 
         const found =
-          json.length == 1 ? json[0] : json.find(e => e.fullname == pName);
+          json.length === 1 ? json[0] : json.find((e) => e.fullname === pName);
 
         if (!found || !found.id) {
           infoDiv.innerHTML = `<p style="color: #ff6b6b; padding: 10px;">Player "${pName.trim()}" not found.</p>`;
@@ -99,7 +99,7 @@ export default function PlayerName(props) {
               borderRadius: "5px",
               border: "2px solid #00ff00",
             }}
-            onError={e => {
+            onError={(e) => {
               e.target.style.display = "none";
             }}
           />

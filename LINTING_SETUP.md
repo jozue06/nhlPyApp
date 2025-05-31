@@ -56,7 +56,7 @@ The project now includes:
 ### Prettier (Code Formatter)
 
 - **Purpose**: Automatically formats JavaScript/React code with **2-space indentation**
-- **Config**: `app/.prettierrc` - **double quotes**, semicolons, 80 char width, **tabWidth: 2**
+- **Config**: `app/.prettierrc` - **double quotes**, semicolons, 80 char width, **tabWidth: 2**, **arrowParens: always**
 - **Usage**: `cd app && npm run format` or `npm run format:check`
 
 ## 🔧 Editor Integration

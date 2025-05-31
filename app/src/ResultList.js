@@ -5,7 +5,7 @@ export default function ResultsList(props) {
 
   // Count total players by counting "Player Full Name" occurrences
   const totalPlayers = results.filter(
-    line => typeof line === "string" && line.includes("Player Full Name:")
+    (line) => typeof line === "string" && line.includes("Player Full Name:")
   ).length;
 
   const listItems = results.map((res, i) => (
