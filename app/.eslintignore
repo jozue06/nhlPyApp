@@ -1,0 +1,8 @@
+node_modules/
+build/
+dist/
+*.min.js
+coverage/
+public/
+.cache/
+.DS_Store 
