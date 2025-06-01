@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # NHL Prospects App - Heroku Deployment Script
-# This script deploys either Python/Flask or Go backend to Heroku with automatic React building
+# This script deploys the Python/Flask backend to Heroku with automatic React building
 
 set -e  # Exit on error
 
@@ -15,51 +15,15 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-# Configuration
-BACKEND_MODE=${1}  # Backend mode is now required
-
-# Show usage if backend mode is not provided
-if [ -z "$BACKEND_MODE" ]; then
-    echo -e "${RED}❌ Error: Backend mode is required${NC}"
-    echo ""
-    echo -e "${YELLOW}Usage: $0 <backend>${NC}"
-    echo ""
-    echo -e "${BLUE}Backend options:${NC}"
-    echo -e "${GREEN}  python${NC}  - Deploy Python Flask backend"
-    echo -e "${GREEN}  go${NC}      - Deploy Go backend"
-    echo ""
-    echo -e "${BLUE}Examples:${NC}"
-    echo -e "${YELLOW}  $0 python${NC}  # Deploy Python Flask backend"
-    echo -e "${YELLOW}  $0 go${NC}      # Deploy Go backend"
-    echo ""
-    exit 1
-fi
-
-echo -e "${BLUE}🏒 NHL Prospects App - Heroku Deployment (${BACKEND_MODE})${NC}"
-echo -e "${BLUE}======================================================${NC}"
+echo -e "${BLUE}🏒 NHL Prospects App - Heroku Deployment${NC}"
+echo -e "${BLUE}========================================${NC}"
 echo ""
-
-# Validate backend mode
-if [ "$BACKEND_MODE" != "python" ] && [ "$BACKEND_MODE" != "go" ]; then
-    echo -e "${RED}❌ Error: Backend mode must be 'python' or 'go'${NC}"
-    echo -e "${YELLOW}Usage: $0 [python|go]${NC}"
-    exit 1
-fi
 
 # Check if we're in the right directory
 if [ ! -f "backend/app.py" ] || [ ! -d "frontend" ]; then
     echo -e "${RED}❌ Error: This script must be run from the nhlPyApp directory${NC}"
     echo -e "${RED}   Make sure you're in the directory containing backend/ and frontend/${NC}"
     exit 1
-fi
-
-# Additional checks for Go backend
-if [ "$BACKEND_MODE" = "go" ]; then
-    if [ ! -f "backend/go/main.go" ] || [ ! -f "backend/go/go.mod" ]; then
-        echo -e "${RED}❌ Error: Go backend files not found (backend/go/main.go, backend/go/go.mod)${NC}"
-        echo -e "${RED}   Make sure you're on the golang-backend branch${NC}"
-        exit 1
-    fi
 fi
 
 # Check if git is clean
@@ -77,80 +41,26 @@ if [ -n "$(git status --porcelain)" ]; then
     fi
 fi
 
-# Clean up any previous deployment files
-echo -e "${BLUE}🧹 Cleaning up previous deployment files...${NC}"
+# Clean up any deployment files
+echo -e "${BLUE}🧹 Cleaning up deployment files...${NC}"
 rm -f main.go go.mod go.sum *.go 2>/dev/null || true
 
-# Backend-specific preparation
-if [ "$BACKEND_MODE" = "go" ]; then
-    echo ""
-    echo -e "${GREEN}🐹 Preparing Go backend for deployment...${NC}"
+# Prepare Python backend deployment
+echo ""
+echo -e "${GREEN}🐍 Preparing Python backend for deployment...${NC}"
 
-    # Build React frontend locally for Go deployment
-    echo -e "${BLUE}⚛️  Building React TypeScript frontend...${NC}"
-    cd frontend
+# Create Procfile for Python
+echo "web: cd backend && gunicorn app:app --bind 0.0.0.0:\$PORT" > Procfile
 
-    # Check if node_modules exists
-    if [ ! -d "node_modules" ]; then
-        echo -e "${BLUE}📦 Installing frontend dependencies...${NC}"
-        npm install
-    fi
+# Python backend uses the bin/post_compile script to build React
+echo -e "${BLUE}📝 Using bin/post_compile script for React building${NC}"
+echo -e "${BLUE}🔧 Heroku will auto-detect Python buildpack from requirements.txt${NC}"
 
-    # Build for production
-    echo -e "${BLUE}🔨 Building for production...${NC}"
-    npm run build
-
-    # Check if build was successful
-    if [ ! -d "build" ]; then
-        echo -e "${RED}❌ Frontend build failed - build directory not found${NC}"
-        exit 1
-    fi
-
-    echo -e "${GREEN}✅ Frontend build completed successfully${NC}"
-    cd ..
-
-    # Copy Go files to root for Heroku deployment
-    echo -e "${BLUE}📝 Setting up Go files for Heroku...${NC}"
-    cp backend/go/go.mod .
-    cp backend/go/go.sum .
-    cp backend/go/*.go .
-
-    # Update file paths in main.go for root deployment
-    sed -i.bak 's|../../frontend/build|./frontend/build|g' main.go
-    rm -f main.go.bak
-
-    # Create Procfile for Go
-    echo "web: ./bin/nhl-app" > Procfile
-
-    # Configure Go buildpack only - React already built locally
-    echo -e "${BLUE}🔧 Configuring Go buildpack...${NC}"
-    heroku buildpacks:clear --app nhl-terminal || true
-    heroku buildpacks:add heroku/go --app nhl-terminal
-
-    echo -e "${BLUE}📝 React frontend built locally and ready for deployment${NC}"
-    echo -e "${GREEN}✅ Go backend preparation completed${NC}"
-
-elif [ "$BACKEND_MODE" = "python" ]; then
-    echo ""
-    echo -e "${GREEN}🐍 Preparing Python backend for deployment...${NC}"
-
-    # Create Procfile for Python
-    echo "web: cd backend && gunicorn app:app --bind 0.0.0.0:\$PORT" > Procfile
-
-    # Configure buildpack for Python
-    echo -e "${BLUE}🔧 Configuring Python buildpack...${NC}"
-    heroku buildpacks:clear --app nhl-terminal || true
-    heroku buildpacks:add heroku/python --app nhl-terminal
-
-    # Python backend uses the existing bin/post_compile script to build React
-    echo -e "${BLUE}📝 Using post_compile script for React building${NC}"
-
-    echo -e "${GREEN}✅ Python backend preparation completed${NC}"
-fi
+echo -e "${GREEN}✅ Python backend preparation completed${NC}"
 
 # Deploy to Heroku
 echo ""
-echo -e "${GREEN}🚀 Deploying ${BACKEND_MODE} backend to Heroku...${NC}"
+echo -e "${GREEN}🚀 Deploying Python backend to Heroku...${NC}"
 
 # Check if heroku remote exists
 if ! git remote | grep -q heroku; then
@@ -162,14 +72,14 @@ fi
 # Add changes to git
 echo -e "${BLUE}📦 Adding deployment files to git...${NC}"
 git add .
-git commit -m "Deploy ${BACKEND_MODE} backend - auto-configured for Heroku" || echo "No changes to commit"
+git commit -m "Deploy Python backend with automatic React building" || echo "No changes to commit"
 
 # Push to Heroku
 echo -e "${BLUE}📤 Pushing to Heroku...${NC}"
 git push heroku HEAD:main
 
 echo ""
-echo -e "${GREEN}🎉 $(echo ${BACKEND_MODE} | sed 's/./\U&/') backend deployment completed!${NC}"
+echo -e "${GREEN}🎉 Python backend deployment completed!${NC}"
 echo ""
 echo -e "${BLUE}🌐 Your app should be available at:${NC}"
 heroku_url=$(heroku apps:info --json 2>/dev/null | jq -r '.app.web_url' 2>/dev/null || echo "")
@@ -183,11 +93,8 @@ echo -e "${YELLOW}💡 Useful commands:${NC}"
 echo -e "${YELLOW}   heroku logs --tail${NC}              # View live logs"
 echo -e "${YELLOW}   heroku open${NC}                     # Open app in browser"
 echo -e "${YELLOW}   heroku ps${NC}                       # Check dyno status"
-if [ "$BACKEND_MODE" = "go" ]; then
-    echo -e "${YELLOW}   heroku config:set GIN_MODE=release${NC}  # Set Go to production mode"
-fi
 echo ""
-echo -e "${BLUE}🎯 Frontend will be automatically built during deployment${NC}"
+echo -e "${BLUE}🎯 React frontend built automatically during deployment${NC}"
 echo -e "${BLUE}   React app accessible at: /react${NC}"
 echo -e "${BLUE}   API endpoints at: /api/json/search${NC}"
 echo ""
