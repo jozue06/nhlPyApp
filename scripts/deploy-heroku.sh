@@ -158,7 +158,7 @@ echo -e "${BLUE}📤 Pushing to Heroku...${NC}"
 git push heroku HEAD:main
 
 echo ""
-echo -e "${GREEN}🎉 ${BACKEND_MODE^} backend deployment completed!${NC}"
+echo -e "${GREEN}🎉 $(echo ${BACKEND_MODE} | sed 's/./\U&/') backend deployment completed!${NC}"
 echo ""
 echo -e "${BLUE}🌐 Your app should be available at:${NC}"
 heroku_url=$(heroku apps:info --json 2>/dev/null | jq -r '.app.web_url' 2>/dev/null || echo "")
