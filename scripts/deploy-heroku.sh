@@ -121,6 +121,12 @@ EOF
 }
 EOF
 
+    # Configure buildpacks for multi-buildpack
+    echo -e "${BLUE}🔧 Configuring multi-buildpack...${NC}"
+    heroku buildpacks:clear --app nhl-terminal || true
+    heroku buildpacks:add heroku/nodejs --app nhl-terminal
+    heroku buildpacks:add heroku/go --app nhl-terminal
+
     echo -e "${BLUE}📝 Created multi-buildpack configuration for Go backend${NC}"
     echo -e "${GREEN}✅ Go backend preparation completed${NC}"
 
@@ -130,6 +136,11 @@ elif [ "$BACKEND_MODE" = "python" ]; then
 
     # Create Procfile for Python
     echo "web: cd backend && gunicorn app:app --bind 0.0.0.0:\$PORT" > Procfile
+
+    # Configure buildpack for Python
+    echo -e "${BLUE}🔧 Configuring Python buildpack...${NC}"
+    heroku buildpacks:clear --app nhl-terminal || true
+    heroku buildpacks:add heroku/python --app nhl-terminal
 
     # Python backend uses the existing bin/post_compile script to build React
     echo -e "${BLUE}📝 Using post_compile script for React building${NC}"
