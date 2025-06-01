@@ -2,15 +2,16 @@ from utils import calculateAge
 
 
 def sort(list, filterName):
-    newList = []
+    newList = list  # Default to original list
+
     if filterName == "-NAME":
-        newlist = sorted(list, key=lambda x: x.fullName)
-    if filterName == "-HEIGHT":
-        newlist = sorted(list, key=lambda x: x.height, reverse=True)
-    if filterName == "+HEIGHT":
-        newlist = sorted(list, key=lambda x: x.height)
-    if filterName == "-AGE":
-        newlist = sorted(
+        newList = sorted(list, key=lambda x: x.fullName)
+    elif filterName == "-HEIGHT":
+        newList = sorted(list, key=lambda x: x.height, reverse=True)
+    elif filterName == "+HEIGHT":
+        newList = sorted(list, key=lambda x: x.height)
+    elif filterName == "-AGE":
+        newList = sorted(
             list,
             key=lambda x: (
                 calculateAge(x.birthDate)
@@ -19,8 +20,8 @@ def sort(list, filterName):
             ),
             reverse=True,
         )
-    if filterName == "+AGE":
-        newlist = sorted(
+    elif filterName == "+AGE":
+        newList = sorted(
             list,
             key=lambda x: (
                 calculateAge(x.birthDate)
@@ -28,11 +29,11 @@ def sort(list, filterName):
                 else 0
             ),
         )
-    if filterName == "-WEIGHT":
-        newlist = sorted(list, key=lambda x: x.weight, reverse=True)
-    if filterName == "+WEIGHT":
-        newlist = sorted(list, key=lambda x: x.weight)
-    if filterName == "-RANK" or filterName == "-MAX-RANK" or filterName == "-MIN-RANK":
+    elif filterName == "-WEIGHT":
+        newList = sorted(list, key=lambda x: x.weight, reverse=True)
+    elif filterName == "+WEIGHT":
+        newList = sorted(list, key=lambda x: x.weight)
+    elif filterName == "-RANK" or filterName == "-MAX-RANK" or filterName == "-MIN-RANK":
         # Handle ranking sorts - if no ranking data available, sort by name
         def get_rank(player):
             if hasattr(player, "ranks") and player.ranks:
@@ -43,6 +44,6 @@ def sort(list, filterName):
             # If no ranking data, put at end (high number) and sort by name as secondary
             return (9999, player.fullName)
 
-        newlist = sorted(list, key=get_rank)
+        newList = sorted(list, key=get_rank)
 
-    return newlist
+    return newList

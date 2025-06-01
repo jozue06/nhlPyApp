@@ -1,8 +1,10 @@
 import requests
+import re
 
 import predicates
 from playerClass import Player
 from processPlayers import processPlayers
+from processPlayers import processPlayersToJSON
 from sorting import sort
 
 # NHL team abbreviations for looping through all teams
@@ -460,3 +462,198 @@ def processIntoHtml(queryString):
         processPlayers(sort(playerList, filterName=filterNameForSorting), results)
 
     return results
+
+
+def processQueryStringJSON(queryString):
+    """Process query string and return JSON results instead of HTML strings"""
+    results = []
+    playerList = []
+
+    # Initialize all filter variables
+    usePositionFilter = False
+    useHandFilter = False
+    useHeightFilter = False
+    useWeightFilter = False
+    useAgeFilter = False
+    useRankFilter = False
+    useCountryCode = False
+    useExcludeCountryCode = False
+    useIdFilter = False
+    useNegHeightFilter = False
+    useNegWeightFilter = False
+    useNegAgeFilter = False
+    useNegRankFilter = False
+    printOnlyRanked = False
+    printOnlyEligable = False
+
+    positionFilter = []
+    handFilter = ""
+    heightFilter = 0
+    weightFilter = 0
+    ageFilter = 0
+    rankFilter = 0
+    countriesToSearchFor = []
+    countriesToExclude = []
+    filterNameForSorting = ""
+
+    # Parse the query string if provided
+    if queryString and len(queryString.strip()) > 0:
+        queryString = queryString.split()
+
+        # Check for help - match the original logic that checks for -H or -h
+        if "-H" in [item.upper() for item in queryString] or any(item.upper() == "-H" for item in queryString):
+            return {
+                "isHelp": True,
+                "messages": [
+                    "-H: Show help",
+                    "-CODES <country_codes>: Filter by birth country codes",
+                    "-EXCLUDE-CODES <country_codes>: Exclude birth country codes",
+                    "-HEIGHT <height>: Filter by height (inches)",
+                    "-AGE <age>: Filter by age",
+                    "-WEIGHT <weight>: Filter by weight (lbs)",
+                    "-POS <positions>: Filter by position (C, LW, RW, D, G)",
+                    "-HAND <L/R>: Filter by shooting/catching hand",
+                    "-RANKED: Show only ranked players",
+                    "-MAX-RANK <rank>: Maximum rank filter",
+                    "-MIN-RANK <rank>: Minimum rank filter",
+                    "-ELIG: Show only draft eligible players"
+                ]
+            }
+
+        # Process filters
+        for i, item in enumerate(queryString):
+            if item.upper() == "-POS":
+                usePositionFilter = True
+                if i + 1 < len(queryString):
+                    positionFilter = queryString[i + 1].split(",")
+            elif item.upper() == "-HAND":
+                useHandFilter = True
+                if i + 1 < len(queryString):
+                    handFilter = queryString[i + 1]
+            elif item.upper() == "-HEIGHT":
+                useHeightFilter = True
+                if i + 1 < len(queryString):
+                    try:
+                        heightFilter = int(queryString[i + 1])
+                        if queryString[i + 1].startswith("-"):
+                            useNegHeightFilter = True
+                            heightFilter = abs(heightFilter)
+                    except ValueError:
+                        pass
+            elif item.upper() == "-WEIGHT":
+                useWeightFilter = True
+                if i + 1 < len(queryString):
+                    try:
+                        weightFilter = int(queryString[i + 1])
+                        if queryString[i + 1].startswith("-"):
+                            useNegWeightFilter = True
+                            weightFilter = abs(weightFilter)
+                    except ValueError:
+                        pass
+            elif item.upper() == "-AGE":
+                useAgeFilter = True
+                if i + 1 < len(queryString):
+                    try:
+                        ageFilter = int(queryString[i + 1])
+                        if queryString[i + 1].startswith("-"):
+                            useNegAgeFilter = True
+                            ageFilter = abs(ageFilter)
+                    except ValueError:
+                        pass
+            elif item.upper() in ["-RANK", "-MAX-RANK"]:
+                useRankFilter = True
+                if i + 1 < len(queryString):
+                    try:
+                        rankFilter = int(queryString[i + 1])
+                        if queryString[i + 1].startswith("-"):
+                            useNegRankFilter = True
+                            rankFilter = abs(rankFilter)
+                    except ValueError:
+                        pass
+            elif item.upper() == "-MIN-RANK":
+                useRankFilter = True
+                useNegRankFilter = True
+                if i + 1 < len(queryString):
+                    try:
+                        rankFilter = int(queryString[i + 1])
+                    except ValueError:
+                        pass
+            elif item.upper() == "-CODES":
+                useCountryCode = True
+                if i + 1 < len(queryString):
+                    countriesToSearchFor = queryString[i + 1].split(",")
+            elif item.upper() == "-EXCLUDE-CODES":
+                useExcludeCountryCode = True
+                if i + 1 < len(queryString):
+                    countriesToExclude = queryString[i + 1].split(",")
+            elif item.upper() == "-ID":
+                useIdFilter = True
+            elif item.upper() == "-RANKED":
+                printOnlyRanked = True
+            elif item.upper() == "-ELIG":
+                printOnlyEligable = True
+
+    # Get real data from NHL API (always, regardless of filters)
+    NHL_TEAMS = [
+        "ANA", "BOS", "BUF", "CGY", "CAR", "CHI", "COL", "CBJ",
+        "DAL", "DET", "EDM", "FLA", "LAK", "MIN", "MTL", "NSH",
+        "NJD", "NYI", "NYR", "OTT", "PHI", "PIT", "SJS", "SEA",
+        "STL", "TBL", "TOR", "UTA", "VAN", "VGK", "WSH", "WPG",
+    ]
+
+    all_prospects = []
+    for team_abbrev in NHL_TEAMS:
+        try:
+            response = requests.get(
+                f"https://api-web.nhle.com/v1/prospects/{team_abbrev}"
+            )
+            if response.status_code == 200:
+                team_data = response.json()
+
+                # Process forwards
+                if "forwards" in team_data:
+                    for player in team_data["forwards"]:
+                        converted_player = convert_api_response_to_old_format(
+                            player
+                        )
+                        all_prospects.append(converted_player)
+
+                # Process defensemen
+                if "defensemen" in team_data:
+                    for player in team_data["defensemen"]:
+                        converted_player = convert_api_response_to_old_format(
+                            player
+                        )
+                        all_prospects.append(converted_player)
+
+                # Process goalies
+                if "goalies" in team_data:
+                    for player in team_data["goalies"]:
+                        converted_player = convert_api_response_to_old_format(
+                            player
+                        )
+                        all_prospects.append(converted_player)
+            else:
+                print(f"Warning: Failed to get prospects for team {team_abbrev}")
+        except Exception as e:
+            print(f"Error getting prospects for team {team_abbrev}: {e}")
+
+    # Filter prospects using existing predicates logic
+    for p in all_prospects:
+        if predicates.all(
+            p,
+            useCountryCode, countriesToSearchFor,
+            useExcludeCountryCode, countriesToExclude,
+            useRankFilter, rankFilter, useNegRankFilter,
+            printOnlyEligable,
+            usePositionFilter, positionFilter,
+            useHandFilter, handFilter,
+            useHeightFilter, heightFilter, useNegHeightFilter,
+            useWeightFilter, weightFilter, useNegWeightFilter,
+            useAgeFilter, ageFilter, useNegAgeFilter,
+        ):
+            newPlayer = Player(p=p)
+            playerList.append(newPlayer)
+
+    # Return JSON instead of calling processPlayers with string results
+    return processPlayersToJSON(sort(playerList, filterName=filterNameForSorting))

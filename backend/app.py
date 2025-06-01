@@ -3,7 +3,7 @@ import json
 from flask import Flask, Response, render_template, request, send_from_directory
 from flask_cors import CORS
 
-from queryParser import processIntoHtml
+from queryParser import processIntoHtml, processQueryStringJSON
 
 app = Flask(__name__, static_url_path="/static", static_folder="static")
 
@@ -36,9 +36,9 @@ def searchHtml():
 @app.route("/api/json/search", methods=["POST"])
 def searchJson():
     queryString = request.get_json(force=True).get("queryString")
-    results = processIntoHtml(queryString)
-    return Response(json.dumps(results))
+    results = processQueryStringJSON(queryString)
+    return Response(json.dumps(results), content_type='application/json')
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=5001)

@@ -1,20 +1,31 @@
 import { useMemo, useState, useCallback, SyntheticEvent } from "react";
 
-interface PlayerInfoProps {
-  playerData: any;
-}
-
-const PlayerInfo = ({ playerData }: PlayerInfoProps) => {
-  const [href, setHref] = useState<string>("");
-  const [pName, setPName] = useState<string>("");
+const PlayerInfo = ({ playerData }: { playerData: any }) => {
   const [infoVisible, setInfoVisible] = useState<boolean>(false);
   const [infoLoaded, setInfoLoaded] = useState<boolean>(false);
 
+  // Helper function to calculate age from birth date
+  const calculateAge = (birthDate: string) => {
+    if (!birthDate) return 0;
+    const birth = new Date(birthDate);
+    const now = new Date();
+    let age = now.getFullYear() - birth.getFullYear();
+    const monthDiff = now.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const toggleInfo = useCallback(async () => {
-    const infoDiv = document.getElementById(`infos${pName}`) as HTMLDivElement;
+    const infoDiv = document.getElementById(
+      `infos${playerData.fullName}`
+    ) as HTMLDivElement;
 
     if (!infoLoaded) {
       try {
+        const linkName = playerData.fullName.replace(" ", "+");
+        const href = `https://autocomplete.eliteprospects.com/all?q=${linkName}`;
         const data = await fetch(href);
         const json = await data.json();
 
@@ -29,10 +40,10 @@ const PlayerInfo = ({ playerData }: PlayerInfoProps) => {
         const found =
           json.length === 1
             ? json[0]
-            : json.find((e: any) => e.fullname === pName);
+            : json.find((e: any) => e.fullname === playerData.fullName);
 
         if (!found || !found.id) {
-          infoDiv.innerHTML = `<p style="color: #ff6b6b; padding: 10px;">Player "${pName.trim()}" not found.</p>`;
+          infoDiv.innerHTML = `<p style="color: #ff6b6b; padding: 10px;">Player "${playerData.fullName.trim()}" not found.</p>`;
           setInfoLoaded(true);
           setInfoVisible(true);
           return;
@@ -42,7 +53,7 @@ const PlayerInfo = ({ playerData }: PlayerInfoProps) => {
 
         const iframe = document.createElement("iframe");
         iframe.src = `https://www.eliteprospects.com/ajax/player.stats.default?playerId=${id}`;
-        iframe.id = `iframe-${pName}`;
+        iframe.id = `iframe-${playerData.fullName}`;
         iframe.style.minWidth = "70vw";
         iframe.style.backgroundColor = "darkgray";
 
@@ -57,7 +68,7 @@ const PlayerInfo = ({ playerData }: PlayerInfoProps) => {
       }
     } else {
       const iframe = document.getElementById(
-        `iframe-${pName}`
+        `iframe-${playerData.fullName}`
       ) as HTMLIFrameElement;
       const errorMessage = infoDiv.querySelector("p") as HTMLParagraphElement;
 
@@ -81,46 +92,55 @@ const PlayerInfo = ({ playerData }: PlayerInfoProps) => {
         }
       }
     }
-  }, [href, pName, infoLoaded, infoVisible]);
+  }, [playerData.fullName, infoLoaded, infoVisible]);
 
-  const getName = useMemo(() => {
-    if (
-      playerData?.includes("Player Headshot:") &&
-      playerData?.includes("http")
-    ) {
-      const headshotUrl = playerData.split("Player Headshot: ")[1];
-      return (
+  const playerDisplay = useMemo(() => {
+    const age = calculateAge(playerData.birthDate);
+
+    return (
+      <div
+        style={{
+          margin: "10px 0",
+          padding: "10px",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+        }}
+      >
         <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            margin: "10px 0",
-          }}
+          style={{ color: "#00ff00", fontWeight: "bold", marginBottom: "10px" }}
         >
-          <img
-            src={headshotUrl}
-            alt="Player headshot"
-            style={{
-              width: "100px",
-              height: "100px",
-              objectFit: "cover",
-              borderRadius: "5px",
-              border: "2px solid #00ff00",
-            }}
-            onError={(e: SyntheticEvent<HTMLImageElement>) => {
-              (e.target as HTMLImageElement).style.display = "none";
-            }}
-          />
+          Player Information
         </div>
-      );
-    } else if (playerData?.includes("Player Full Name")) {
-      const name = playerData.split(":")[1];
-      const linkName = name.replace("%20", "+");
-      setHref(`https://autocomplete.eliteprospects.com/all?q=${linkName}`);
-      setPName(name.trim());
-      return (
-        <>
-          {playerData}
+
+        {/* Show headshot if available */}
+        {playerData.headshot && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              margin: "10px 0",
+            }}
+          >
+            <img
+              src={playerData.headshot}
+              alt="Player headshot"
+              style={{
+                width: "100px",
+                height: "100px",
+                objectFit: "cover",
+                borderRadius: "5px",
+                border: "2px solid #00ff00",
+              }}
+              onError={(e: SyntheticEvent<HTMLImageElement>) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </div>
+        )}
+
+        <div style={{ color: "#00ff00" }}>Player NHL ID: {playerData.id}</div>
+        <div style={{ color: "#00ff00" }}>
+          Player Full Name: {playerData.fullName}
           <button
             onClick={toggleInfo}
             style={{
@@ -135,17 +155,51 @@ const PlayerInfo = ({ playerData }: PlayerInfoProps) => {
           >
             {!infoLoaded ? "Get Info" : infoVisible ? "Hide Info" : "Show Info"}
           </button>
-          <>
-            <div id={`infos${pName}`}></div>
-          </>
-        </>
-      );
-    } else {
-      return <>{playerData}</>;
-    }
-  }, [playerData, infoVisible, infoLoaded, pName, toggleInfo]);
+        </div>
+        <div style={{ color: "#00ff00" }}>
+          Player Birth Date: {playerData.birthDate}
+        </div>
+        <div style={{ color: "#00ff00" }}>Player Current Age: {age}</div>
+        <div style={{ color: "#00ff00" }}>
+          Player Height: {playerData.height || "N/A"}
+        </div>
+        <div style={{ color: "#00ff00" }}>
+          Player Weight: {playerData.weight ? `${playerData.weight}lbs` : "N/A"}
+        </div>
+        <div style={{ color: "#00ff00" }}>
+          Player Birth Country: {playerData.birthCountry || "N/A"}
+        </div>
+        <div style={{ color: "#00ff00" }}>
+          Player Position: {playerData.primaryPosition?.name || "N/A"}
+        </div>
 
-  return <>{getName}</>;
+        {/* Handle shot/glove hand based on position */}
+        {playerData.primaryPosition?.abbreviation === "G" ? (
+          <div style={{ color: "#00ff00" }}>
+            Player Glove Hand: {playerData.shootsCatches || "N/A"}
+          </div>
+        ) : (
+          <div style={{ color: "#00ff00" }}>
+            Player Shot Hand: {playerData.shootsCatches || "N/A"}
+          </div>
+        )}
+
+        <div style={{ color: "#00ff00" }}>
+          Player Draft Eligibility: {playerData.draftStatus || "N/A"}
+        </div>
+        <div style={{ color: "#00ff00" }}>
+          Player Midterm Rank: not currently ranked
+        </div>
+        <div style={{ color: "#00ff00" }}>
+          Player Final Rank: not currently ranked
+        </div>
+
+        <div id={`infos${playerData.fullName}`}></div>
+      </div>
+    );
+  }, [playerData, infoVisible, infoLoaded, toggleInfo]);
+
+  return <>{playerDisplay}</>;
 };
 
 export default PlayerInfo;
