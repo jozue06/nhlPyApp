@@ -104,8 +104,8 @@
 			{% else %}
 				<!-- Display filter information -->
 				{% if results.filterInfo %}
-					<div style="color: #ffff00; padding: 10px; margin: 10px 0; border: 1px solid #ffff00; border-radius: 5px; background-color: #1a1a1a;">
-						<div style="font-weight: bold; margin-bottom: 5px;">Active Filters:</div>
+					<div style="color: #00ff00; padding: 10px; margin: 10px 0;">
+						<div style="font-weight: bold; margin-bottom: 5px;">Active Filters and Sorting:</div>
 						<ul style="margin: 0; padding-left: 20px;">
 							{% for filter in results.filterInfo %}
 								<li style="margin-bottom: 3px;">{{ filter }}</li>
@@ -131,7 +131,7 @@
 					{% endif %}
 
 					{% for player in results.players %}
-						<div style="margin: 20px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+						<div style="margin: 20px 0; padding: 10px;">
 							<!-- Player headshot -->
 							{% if player.headshot %}
 								<div style="margin: 10px 0;">
@@ -173,6 +173,9 @@
 							<p style="color: aqua !important;">Player Draft Eligibility: {{ player.draftStatus or 'N/A' }}</p>
 							<p style="color: aqua !important;">Player Midterm Rank: not currently ranked</p>
 							<p style="color: aqua !important;">Player Final Rank: not currently ranked</p>
+
+							<!-- Add a horizontal line at the bottom of each player section -->
+							<hr style="border: none; border-top: 1px solid #444; margin: 15px 0;">
 						</div>
 					{% endfor %}
 				{% endif %}

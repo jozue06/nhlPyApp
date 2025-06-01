@@ -40,9 +40,9 @@ if [ -f "backend/requirements.txt" ]; then
 fi
 
 echo -e "${GREEN}🚀 Starting Flask server...${NC}"
-echo -e "${GREEN}   Backend API: http://127.0.0.1:5000/api/json/search${NC}"
-echo -e "${GREEN}   Web App: http://127.0.0.1:5000${NC}"
-echo -e "${GREEN}   React Version: http://127.0.0.1:5000/react${NC}"
+echo -e "${GREEN}   Backend API: http://127.0.0.1:5001/api/json/search${NC}"
+echo -e "${GREEN}   Web App: http://127.0.0.1:5001${NC}"
+echo -e "${GREEN}   React Version: http://127.0.0.1:5001/react${NC}"
 echo ""
 echo -e "${YELLOW}💡 Use Ctrl+C to stop the server${NC}"
 echo ""

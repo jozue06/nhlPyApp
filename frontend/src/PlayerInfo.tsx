@@ -79,12 +79,10 @@ const PlayerInfo = ({ playerData }: { playerData: any }) => {
         style={{
           margin: "10px 0",
           padding: "10px",
-          border: "1px solid #ccc",
-          borderRadius: "5px",
         }}
       >
         <div
-          style={{ color: "#00ff00", fontWeight: "bold", marginBottom: "10px" }}
+          style={{ color: "aqua", fontWeight: "bold", marginBottom: "10px" }}
         >
           Player Information
         </div>
@@ -115,8 +113,8 @@ const PlayerInfo = ({ playerData }: { playerData: any }) => {
           </div>
         )}
 
-        <div style={{ color: "#00ff00" }}>Player NHL ID: {playerData.id}</div>
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>Player NHL ID: {playerData.id}</div>
+        <div style={{ color: "aqua" }}>
           Player Full Name: {playerData.fullName}
           <button
             onClick={toggleInfo}
@@ -133,45 +131,54 @@ const PlayerInfo = ({ playerData }: { playerData: any }) => {
             {!infoLoaded ? "Get Info" : infoVisible ? "Hide Info" : "Show Info"}
           </button>
         </div>
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>
           Player Birth Date: {playerData.birthDate}
         </div>
-        <div style={{ color: "#00ff00" }}>Player Current Age: {age}</div>
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>Player Current Age: {age}</div>
+        <div style={{ color: "aqua" }}>
           Player Height: {playerData.height || "N/A"}
         </div>
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>
           Player Weight: {playerData.weight ? `${playerData.weight}lbs` : "N/A"}
         </div>
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>
           Player Birth Country: {playerData.birthCountry || "N/A"}
         </div>
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>
           Player Position: {playerData.primaryPosition?.name || "N/A"}
         </div>
 
         {/* Handle shot/glove hand based on position */}
         {playerData.primaryPosition?.abbreviation === "G" ? (
-          <div style={{ color: "#00ff00" }}>
+          <div style={{ color: "aqua" }}>
             Player Glove Hand: {playerData.shootsCatches || "N/A"}
           </div>
         ) : (
-          <div style={{ color: "#00ff00" }}>
+          <div style={{ color: "aqua" }}>
             Player Shot Hand: {playerData.shootsCatches || "N/A"}
           </div>
         )}
 
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>
           Player Draft Eligibility: {playerData.draftStatus || "N/A"}
         </div>
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>
           Player Midterm Rank: not currently ranked
         </div>
-        <div style={{ color: "#00ff00" }}>
+        <div style={{ color: "aqua" }}>
           Player Final Rank: not currently ranked
         </div>
 
         <div id={`infos${playerData.fullName}`}></div>
+
+        {/* Add a horizontal line at the bottom of each player section */}
+        <hr
+          style={{
+            border: "none",
+            borderTop: "1px solid #444",
+            margin: "15px 0",
+          }}
+        />
       </div>
     );
   }, [playerData, infoVisible, infoLoaded, toggleInfo, age]);

@@ -42,7 +42,7 @@ fi
 
 # Clean up any existing servers on the ports we'll use
 echo -e "${YELLOW}🧹 Cleaning up existing servers...${NC}"
-lsof -ti:3000 | xargs kill -9 2>/dev/null; lsof -ti:5000 | xargs kill -9 2>/dev/null; lsof -ti:5001 | xargs kill -9 2>/dev/null; lsof -ti:8080 | xargs kill -9 2>/dev/null; echo "Killed all servers on ports 3000, 5000, 5001, and 8080"
+lsof -ti:3000 | xargs kill -9 2>/dev/null; lsof -ti:5001 | xargs kill -9 2>/dev/null; echo "Killed all servers on ports 3000 and 5001"
 echo ""
 
 # Function to cleanup background processes on exit

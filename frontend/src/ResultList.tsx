@@ -46,16 +46,13 @@ const ResultList = ({ results }: { results: any }) => {
         {filterInfo.length > 0 && (
           <div
             style={{
-              color: "#ffff00",
+              color: "#00ff00",
               padding: "10px",
               margin: "10px 0",
-              border: "1px solid #ffff00",
-              borderRadius: "5px",
-              backgroundColor: "#1a1a1a",
             }}
           >
             <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
-              Active Filters:
+              Active Filters and Sorting:
             </div>
             <ul style={{ margin: 0, paddingLeft: "20px" }}>
               {filterInfo.map((filter: string, index: number) => (

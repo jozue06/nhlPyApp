@@ -299,6 +299,26 @@ def processQueryStringJSON(queryString):
     else:
         filter_info.append("Showing all prospects (no filters applied)")
 
+    # Add sorting information to filter display
+    if filterNameForSorting:
+        sorting_descriptions = {
+            "-NAME": "Sorting by Name (A-Z)",
+            "-HEIGHT": "Sorting by Height (Tallest to Shortest)",
+            "+HEIGHT": "Sorting by Height (Shortest to Tallest)",
+            "-AGE": "Sorting by Age (Oldest to Youngest)",
+            "+AGE": "Sorting by Age (Youngest to Oldest)",
+            "-WEIGHT": "Sorting by Weight (Heaviest to Lightest)",
+            "+WEIGHT": "Sorting by Weight (Lightest to Heaviest)",
+            "-RANK": "Sorting by Draft Ranking (Best to Worst)",
+            "-MAX-RANK": "Sorting by Draft Ranking (Best to Worst)",
+            "-MIN-RANK": "Sorting by Draft Ranking (Best to Worst)"
+        }
+
+        sort_description = sorting_descriptions.get(filterNameForSorting, f"Sorting by {filterNameForSorting}")
+        filter_info.append(f"{sort_description}")
+    else:
+        filter_info.append("Sorting by Name (A-Z)")
+
     # Get real data from NHL API
     all_prospects = []
     playerList = []
