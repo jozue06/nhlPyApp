@@ -89,6 +89,7 @@ if [ "$BACKEND_MODE" = "go" ]; then
     # Copy Go files to root for Heroku deployment
     echo -e "${BLUE}📝 Setting up Go files for Heroku...${NC}"
     cp backend/go/go.mod .
+    cp backend/go/go.sum .
     cp backend/go/*.go .
 
     # Update file paths in main.go for root deployment
