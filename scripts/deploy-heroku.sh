@@ -41,21 +41,8 @@ if [ -n "$(git status --porcelain)" ]; then
     fi
 fi
 
-# Clean up any deployment files
-echo -e "${BLUE}🧹 Cleaning up deployment files...${NC}"
-
-# Prepare Python backend deployment
-echo ""
-echo -e "${GREEN}🐍 Preparing Python backend for deployment...${NC}"
-
-# Create Procfile for Python
-echo "web: cd backend && gunicorn app:app --bind 0.0.0.0:\$PORT" > Procfile
-
 # Python backend uses the bin/post_compile script to build React
 echo -e "${BLUE}📝 Using bin/post_compile script for React building${NC}"
-echo -e "${BLUE}🔧 Heroku will auto-detect Python buildpack from requirements.txt${NC}"
-
-echo -e "${GREEN}✅ Python backend preparation completed${NC}"
 
 # Deploy to Heroku
 echo ""
