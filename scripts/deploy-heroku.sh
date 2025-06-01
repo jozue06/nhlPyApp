@@ -111,7 +111,7 @@ EOF
   "version": "1.0.0",
   "description": "NHL Player Search Terminal App - Go Backend",
   "scripts": {
-    "heroku-postbuild": "cd frontend && npm install && npm run build"
+    "heroku-postbuild": "cd frontend && npm install --include=dev && npm run build"
   },
   "engines": {
     "node": ">=16.0.0",
