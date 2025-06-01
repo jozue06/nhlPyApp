@@ -54,8 +54,7 @@ export const Form = () => {
           data,
           loading: false,
         }));
-      } catch (error) {
-        console.error("Search error:", error);
+      } catch {
         setState((prev) => ({ ...prev, loading: false }));
       }
     },
@@ -86,7 +85,7 @@ export const Form = () => {
           id="textareainput"
           value={state.value}
           onChange={handleChange}
-          onKeyPress={onKeyPress}
+          onKeyUp={onKeyPress}
           name="queryString"
           className="terminal"
           autoFocus={true}
