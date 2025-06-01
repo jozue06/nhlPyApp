@@ -45,6 +45,19 @@ def searchJson():
     return Response(json.dumps(results), content_type='application/json')
 
 
+@app.route("/debug-paths", methods=["GET"])
+def debugPaths():
+    return {
+        "cwd": os.getcwd(),
+        "file": __file__,
+        "abspath_file": os.path.abspath(__file__),
+        "BASE_DIR": BASE_DIR,
+        "REACT_BUILD_DIR": REACT_BUILD_DIR,
+        "exists": os.path.exists(REACT_BUILD_DIR),
+        "index_exists": os.path.exists(os.path.join(REACT_BUILD_DIR, "index.html"))
+    }
+
+
 if __name__ == "__main__":
     # Use PORT environment variable for Heroku, fallback to 5001 for local development
     port = int(os.environ.get('PORT', 5001))
