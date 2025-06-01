@@ -12,8 +12,8 @@ app = Flask(__name__, static_url_path="/static", static_folder="static")
 CORS(app)
 
 # Get the correct path to the React build directory
-# In Heroku, we need to go up one level from backend/ to get to frontend/build
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# When running with 'cd backend && gunicorn app:app', we need to go up one level from current working directory
+BASE_DIR = os.path.dirname(os.getcwd())
 REACT_BUILD_DIR = os.path.join(BASE_DIR, 'frontend', 'build')
 
 @app.route("/react", methods=["GET"])
