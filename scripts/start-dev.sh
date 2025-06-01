@@ -87,12 +87,6 @@ fi
 
 # Update React frontend configuration
 echo -e "${BLUE}📝 Configuring React TypeScript frontend...${NC}"
-cd frontend/src
-
-# Create the environment variable for Vite (always false for Python backend)
-echo "VITE_USE_GO_BACKEND=false" > ../.env.development
-
-cd ../..
 
 echo ""
 

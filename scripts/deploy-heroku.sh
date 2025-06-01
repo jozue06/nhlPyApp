@@ -43,7 +43,6 @@ fi
 
 # Clean up any deployment files
 echo -e "${BLUE}🧹 Cleaning up deployment files...${NC}"
-rm -f main.go go.mod go.sum *.go 2>/dev/null || true
 
 # Prepare Python backend deployment
 echo ""
