@@ -1,8 +1,10 @@
 import PlayerInfo from "./PlayerInfo";
 
-export default function ResultsList(props) {
-  const results = props.results;
+interface ResultListProps {
+  results: any[];
+}
 
+const ResultList = ({ results }: ResultListProps) => {
   // Count total players by counting "Player Full Name" occurrences
   const totalPlayers = results.filter(
     (line) => typeof line === "string" && line.includes("Player Full Name:")
@@ -32,4 +34,6 @@ export default function ResultsList(props) {
       <ul>{listItems}</ul>
     </div>
   );
-}
+};
+
+export default ResultList;

@@ -5,6 +5,7 @@ A comprehensive Python application for exploring NHL prospect data, featuring bo
 ## 🌟 Features
 
 ### 🔍 **Advanced Filtering System**
+
 - **Position Filters**: Search by specific positions (C, L, R, D, G) or all forwards
 - **Country Filters**: Filter by birth country using country codes (USA, CAN, SWE, etc.)
 - **Country Exclusion**: Exclude specific countries from search results
@@ -14,12 +15,14 @@ A comprehensive Python application for exploring NHL prospect data, featuring bo
 - **Combined Filters**: Mix and match any filters for precise searches
 
 ### 📊 **Data Coverage**
+
 - **~702 Total Prospects** across all 32 NHL teams
 - **Real-time Data** from official NHL API endpoints
 - **Comprehensive Info**: Player stats, physical attributes, birth details, and more
 - **Multiple Interfaces**: Terminal commands, Flask web app, and React frontend
 
 ### 🖥️ **Multiple Interfaces**
+
 1. **Python Terminal**: Direct command-line interface for power users
 2. **Flask Web App**: Server-rendered HTML interface
 3. **React SPA**: Modern single-page application with dynamic UI
@@ -41,6 +44,7 @@ cd nhlPyApp
 ```
 
 This will automatically:
+
 - ✅ Start Python Flask server on port 5000
 - ✅ Start React development server on port 3000
 - ✅ Configure API endpoints dynamically
@@ -50,6 +54,7 @@ This will automatically:
 ### **Option 2: Manual Setup**
 
 #### Python Backend Setup
+
 ```bash
 # Create virtual environment
 python3 -m venv .venv
@@ -63,6 +68,7 @@ python app.py
 ```
 
 #### React Frontend Setup
+
 ```bash
 # Navigate to React app
 cd app
@@ -77,12 +83,14 @@ npm start
 ## 🎯 Usage Examples
 
 ### **Help Menu**
+
 ```bash
 # Get all available filter options
 -H
 ```
 
 ### **Position Searches**
+
 ```bash
 # All goalies
 -POS G
@@ -98,6 +106,7 @@ npm start
 ```
 
 ### **Country Searches**
+
 ```bash
 # USA players only
 -CODES "USA"
@@ -119,6 +128,7 @@ npm start
 ```
 
 ### **Physical Attribute Searches**
+
 ```bash
 # Players 21 and younger
 -AGE "21"
@@ -140,6 +150,7 @@ npm start
 ```
 
 ### **Combined Searches**
+
 ```bash
 # Young USA goalies
 -POS G -CODES "USA" -AGE "21"
@@ -155,6 +166,7 @@ npm start
 ```
 
 ### **Individual Player Lookup**
+
 ```bash
 # Find specific player by NHL ID
 -ID "8479361"
@@ -163,6 +175,7 @@ npm start
 ## 🔧 Technical Details
 
 ### **Architecture**
+
 - **Backend**: Python 3.8+ with Flask web framework
 - **Frontend**: React 17+ with Axios for API calls
 - **Data Source**: Official NHL Prospects API (`api-web.nhle.com`)
@@ -170,26 +183,30 @@ npm start
 - **Sorting**: Multi-criteria sorting with fallback mechanisms
 
 ### **API Integration**
+
 - **32 Team Endpoints**: Loops through all NHL team abbreviations
 - **Data Transformation**: Converts new API format to legacy-compatible structure
 - **Error Handling**: Graceful handling of API failures and missing data
 - **Rate Limiting**: Respectful API usage with proper delays
 
 ### **Key Files**
+
 - `app.py` - Flask web server and API routes
 - `queryParser.py` - Main query processing and API integration
 - `predicates.py` - Filter logic and boolean operations
 - `sorting.py` - Multi-criteria sorting algorithms
 - `utils.py` - Helper functions for data conversion
-- `app/src/Form.js` - React frontend component
+- `frontend/src/Form.tsx` - React frontend component
 
 ## 🌐 Deployment
 
 ### **Live Demo**
+
 - **Herokuapp**: [https://nhl-terminal.herokuapp.com](https://nhl-terminal.herokuapp.com)
 - **React Version**: [https://nhl-terminal.herokuapp.com/react](https://nhl-terminal.herokuapp.com/react)
 
 ### **Local URLs (when running)**
+
 - **Python Backend API**: http://127.0.0.1:5000
 - **Flask Web App**: http://127.0.0.1:5000
 - **Flask React Served**: http://127.0.0.1:5000/react
@@ -211,6 +228,7 @@ python3 -c "from queryParser import processIntoHtml; print(processIntoHtml('-POS
 ## 📝 Recent Updates
 
 ### **✅ API Migration Complete**
+
 - ✅ Migrated from deprecated API to new NHL endpoints
 - ✅ Updated data structure handling for multilingual fields
 - ✅ Fixed all filter logic bugs and parameter mismatches
@@ -218,6 +236,7 @@ python3 -c "from queryParser import processIntoHtml; print(processIntoHtml('-POS
 - ✅ Enhanced error handling and fallback mechanisms
 
 ### **🔄 API Limitations**
+
 - **Draft Rankings**: Not available in new API (shows all players)
 - **Amateur Teams/Leagues**: Not provided in new API structure
 - **Current League Info**: No information about what league players currently play in
@@ -233,4 +252,4 @@ This project is for educational and personal use, utilizing publicly available N
 
 ---
 
-*Built with ❤️ for hockey fans and data enthusiasts*
+_Built with ❤️ for hockey fans and data enthusiasts_

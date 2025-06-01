@@ -5,6 +5,9 @@
 
 set -e
 
+# Change to project root directory
+cd "$(dirname "$0")/.."
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -16,8 +19,8 @@ echo -e "${BLUE}🐍 NHL Prospects - Python Backend${NC}"
 echo -e "${BLUE}=================================${NC}"
 
 # Check if we're in the right directory
-if [ ! -f "app.py" ]; then
-    echo -e "${RED}❌ Error: app.py not found. Run this script from the nhlPyApp directory.${NC}"
+if [ ! -f "backend/app.py" ]; then
+    echo -e "${RED}❌ Error: backend/app.py not found. Make sure you're running this from the nhlPyApp directory.${NC}"
     exit 1
 fi
 
@@ -31,9 +34,9 @@ else
 fi
 
 # Install dependencies if needed
-if [ -f "requirements.txt" ]; then
+if [ -f "backend/requirements.txt" ]; then
     echo -e "${BLUE}📦 Checking Python dependencies...${NC}"
-    pip install -r requirements.txt > /dev/null 2>&1
+    pip install -r backend/requirements.txt > /dev/null 2>&1
 fi
 
 echo -e "${GREEN}🚀 Starting Flask server...${NC}"
@@ -44,5 +47,6 @@ echo ""
 echo -e "${YELLOW}💡 Use Ctrl+C to stop the server${NC}"
 echo ""
 
-# Start Flask server
-python app.py 
+# Start Flask server from backend directory
+cd backend
+python app.py

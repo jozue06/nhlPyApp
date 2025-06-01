@@ -1,7 +1,7 @@
 # Dependencies
 .venv/
 venv/
-app/node_modules/
+frontend/node_modules/
 
 # IDE - Include workspace settings but exclude user-specific files
 .vscode/launch.json
@@ -58,8 +58,8 @@ coverage.xml
 .pytest_cache/
 
 # React build
-app/build/
-app/dist/
+frontend/build/
+frontend/dist/
 
 # ESLint cache
 .eslintcache
