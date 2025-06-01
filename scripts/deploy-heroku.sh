@@ -58,7 +58,7 @@ fi
 # Add changes to git
 echo -e "${BLUE}📦 Adding deployment files to git...${NC}"
 git add .
-git commit -m "Deploy Python backend with automatic React building" || echo "No changes to commit"
+git commit -m "Deploy Python backend with automatic React building"
 
 # Push to Heroku
 echo -e "${BLUE}📤 Pushing to Heroku...${NC}"
