@@ -16,5 +16,6 @@ echo "-----> Building React frontend..."
 cd frontend
 npm install
 npm run build
+cd ..
 
 echo "-----> React build completed successfully!"

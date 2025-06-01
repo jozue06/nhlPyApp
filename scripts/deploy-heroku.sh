@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # NHL Prospects App - Heroku Deployment Script
-# This script builds the React frontend and deploys either Python/Flask or Go backend to Heroku
+# This script deploys either Python/Flask or Go backend to Heroku with automatic React building
 
 set -e  # Exit on error
 
@@ -77,73 +77,62 @@ if [ -n "$(git status --porcelain)" ]; then
     fi
 fi
 
-# Build React frontend for production
-echo -e "${GREEN}⚛️  Building React TypeScript frontend...${NC}"
-cd frontend
-
-# Check if node_modules exists
-if [ ! -d "node_modules" ]; then
-    echo -e "${BLUE}📦 Installing frontend dependencies...${NC}"
-    npm install
-fi
-
-# Build for production
-echo -e "${BLUE}🔨 Building for production...${NC}"
-npm run build
-
-# Check if build was successful
-if [ ! -d "build" ]; then
-    echo -e "${RED}❌ Frontend build failed - build directory not found${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}✅ Frontend build completed successfully${NC}"
-echo -e "${GREEN}   Build output: frontend/build/${NC}"
-
-# Go back to root directory
-cd ..
+# Clean up any previous deployment files
+echo -e "${BLUE}🧹 Cleaning up previous deployment files...${NC}"
+rm -f main.go go.mod go.sum *.go 2>/dev/null || true
 
 # Backend-specific preparation
 if [ "$BACKEND_MODE" = "go" ]; then
     echo ""
     echo -e "${GREEN}🐹 Preparing Go backend for deployment...${NC}"
 
-    # For Heroku Go buildpack, copy the Go files to root temporarily
-    echo -e "${BLUE}📝 Setting up Go files for Heroku...${NC}"
-
     # Copy Go files to root for Heroku deployment
+    echo -e "${BLUE}📝 Setting up Go files for Heroku...${NC}"
     cp backend/go/go.mod .
     cp backend/go/*.go .
 
     # Update file paths in main.go for root deployment
-    sed -i.bak 's|../../frontend/build|frontend/build|g' main.go
+    sed -i.bak 's|../../frontend/build|./frontend/build|g' main.go
+    rm -f main.go.bak
 
-    # Create or update Procfile for Go
-    echo "web: go run ." > Procfile
-    echo -e "${BLUE}📝 Created Procfile for Go backend${NC}"
+    # Create Procfile for Go
+    echo "web: ./nhl-app" > Procfile
 
-    # Ensure Go buildpack is set
-    echo -e "${BLUE}🔧 Setting up Go buildpack...${NC}"
-    heroku buildpacks:clear 2>/dev/null || true
-    heroku buildpacks:add heroku/go
+    # Create .buildpacks file for multi-buildpack support
+    cat > .buildpacks << EOF
+https://github.com/heroku/heroku-buildpack-nodejs
+https://github.com/heroku/heroku-buildpack-go
+EOF
 
+    # Create package.json for Node.js buildpack to build React
+    cat > package.json << 'EOF'
+{
+  "name": "nhl-terminal-app",
+  "version": "1.0.0",
+  "description": "NHL Player Search Terminal App - Go Backend",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "heroku-postbuild": "cd frontend && npm install && npm run build"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
+EOF
+
+    echo -e "${BLUE}📝 Created multi-buildpack configuration for Go backend${NC}"
     echo -e "${GREEN}✅ Go backend preparation completed${NC}"
 
 elif [ "$BACKEND_MODE" = "python" ]; then
     echo ""
     echo -e "${GREEN}🐍 Preparing Python backend for deployment...${NC}"
 
-    # Clean up any Go files from root if they exist
-    rm -f main.go go.mod *.go 2>/dev/null || true
+    # Create Procfile for Python
+    echo "web: cd backend && gunicorn app:app --bind 0.0.0.0:\$PORT" > Procfile
 
-    # Create or update Procfile for Python
-    echo "web: cd backend && python app.py" > Procfile
-    echo -e "${BLUE}📝 Created Procfile for Python backend${NC}"
-
-    # Ensure Python buildpack is set
-    echo -e "${BLUE}🔧 Setting up Python buildpack...${NC}"
-    heroku buildpacks:clear 2>/dev/null || true
-    heroku buildpacks:add heroku/python
+    # Python backend uses the existing bin/post_compile script to build React
+    echo -e "${BLUE}📝 Using post_compile script for React building${NC}"
 
     echo -e "${GREEN}✅ Python backend preparation completed${NC}"
 fi
@@ -159,16 +148,14 @@ if ! git remote | grep -q heroku; then
     exit 1
 fi
 
-# Add changes to git if needed
-if [ -n "$(git status --porcelain)" ]; then
-    echo -e "${BLUE}📦 Adding deployment files to git...${NC}"
-    git add .
-    git commit -m "Deploy ${BACKEND_MODE} backend with frontend build" || echo "No changes to commit"
-fi
+# Add changes to git
+echo -e "${BLUE}📦 Adding deployment files to git...${NC}"
+git add .
+git commit -m "Deploy ${BACKEND_MODE} backend - auto-configured for Heroku" || echo "No changes to commit"
 
 # Push to Heroku
-echo -e "${BLUE}📤 Pushing to Heroku master...${NC}"
-git push heroku HEAD:master
+echo -e "${BLUE}📤 Pushing to Heroku...${NC}"
+git push heroku HEAD:main
 
 echo ""
 echo -e "${GREEN}🎉 ${BACKEND_MODE^} backend deployment completed!${NC}"
@@ -182,10 +169,14 @@ else
 fi
 echo ""
 echo -e "${YELLOW}💡 Useful commands:${NC}"
-echo -e "${YELLOW}   heroku logs --tail${NC}    # View live logs"
-echo -e "${YELLOW}   heroku open${NC}           # Open app in browser"
-echo -e "${YELLOW}   heroku ps${NC}             # Check dyno status"
+echo -e "${YELLOW}   heroku logs --tail${NC}              # View live logs"
+echo -e "${YELLOW}   heroku open${NC}                     # Open app in browser"
+echo -e "${YELLOW}   heroku ps${NC}                       # Check dyno status"
 if [ "$BACKEND_MODE" = "go" ]; then
     echo -e "${YELLOW}   heroku config:set GIN_MODE=release${NC}  # Set Go to production mode"
 fi
+echo ""
+echo -e "${BLUE}🎯 Frontend will be automatically built during deployment${NC}"
+echo -e "${BLUE}   React app accessible at: /react${NC}"
+echo -e "${BLUE}   API endpoints at: /api/json/search${NC}"
 echo ""
