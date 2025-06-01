@@ -99,35 +99,12 @@ if [ "$BACKEND_MODE" = "go" ]; then
     # Create Procfile for Go
     echo "web: ./nhl-app" > Procfile
 
-    # Create .buildpacks file for multi-buildpack support
-    cat > .buildpacks << EOF
-https://github.com/heroku/heroku-buildpack-nodejs
-https://github.com/heroku/heroku-buildpack-go
-EOF
-
-    # Create package.json for Node.js buildpack to build React
-    cat > package.json << 'EOF'
-{
-  "name": "nhl-terminal-app",
-  "version": "1.0.0",
-  "description": "NHL Player Search Terminal App - Go Backend",
-  "scripts": {
-    "heroku-postbuild": "cd frontend && npm install --include=dev && npm run build"
-  },
-  "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
-  }
-}
-EOF
-
-    # Configure buildpacks for multi-buildpack
-    echo -e "${BLUE}🔧 Configuring multi-buildpack...${NC}"
+    # Configure Go buildpack only - React will be built by bin/post_compile
+    echo -e "${BLUE}🔧 Configuring Go buildpack...${NC}"
     heroku buildpacks:clear --app nhl-terminal || true
-    heroku buildpacks:add heroku/nodejs --app nhl-terminal
     heroku buildpacks:add heroku/go --app nhl-terminal
 
-    echo -e "${BLUE}📝 Created multi-buildpack configuration for Go backend${NC}"
+    echo -e "${BLUE}📝 Using bin/post_compile script for React building${NC}"
     echo -e "${GREEN}✅ Go backend preparation completed${NC}"
 
 elif [ "$BACKEND_MODE" = "python" ]; then
