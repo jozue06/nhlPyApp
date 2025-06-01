@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 from queryParser import processIntoHtml
 
-app = Flask(__name__, static_url_path="", static_folder="../frontend/build")
+app = Flask(__name__, static_url_path="/static", static_folder="static")
 
 # Enable CORS for all domains on all routes
 CORS(app)
@@ -13,7 +13,7 @@ CORS(app)
 
 @app.route("/react", methods=["GET"])
 def indexReact():
-    return send_from_directory(app.static_folder, "index.html")
+    return send_from_directory("../frontend/build", "index.html")
 
 
 @app.route("/", methods=["GET"])
