@@ -16,6 +16,11 @@ def indexReact():
     return send_from_directory("../frontend/build", "index.html")
 
 
+@app.route("/assets/<path:filename>", methods=["GET"])
+def reactAssets(filename):
+    return send_from_directory("../frontend/build/assets", filename)
+
+
 @app.route("/", methods=["GET"])
 def indexHtml():
     return render_template("index.html")
