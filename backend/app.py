@@ -1,4 +1,5 @@
 import json
+import os
 
 from flask import Flask, Response, render_template, request, send_from_directory
 from flask_cors import CORS
@@ -41,4 +42,6 @@ def searchJson():
 
 
 if __name__ == "__main__":
-    app.run(port=5001)
+    # Use PORT environment variable for Heroku, fallback to 5001 for local development
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port)
