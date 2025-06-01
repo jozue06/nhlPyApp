@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 
 import requests
-
 import predicates
-from playerClass import Player
-from processPlayers import processPlayers
-from queryParser import NHL_TEAMS, convert_api_response_to_old_format
-from sorting import sort
+from queryParser import NHL_TEAMS, create_player_from_api_data, processQueryStringJSON
 
 
 def manual_goalie_search():
-    """Manually implement what processIntoHtml should do for goalies"""
+    """Manually implement what processQueryStringJSON should do for goalies"""
     print("Manual goalie search across first 5 teams...")
 
-    # Set up filters like processIntoHtml does
+    # Set up filters like processQueryStringJSON does
     usePositionFilter = True
     positionFilter = ["G"]
 
@@ -37,7 +33,7 @@ def manual_goalie_search():
     ageFilter = 0
     useNegAgeFilter = False
 
-    playerList = []
+    all_filtered_players = []
 
     # Loop through first 5 teams to get prospects
     for team_abbrev in NHL_TEAMS[:5]:
@@ -54,14 +50,12 @@ def manual_goalie_search():
                 for position_group in ["forwards", "defensemen", "goalies"]:
                     if position_group in team_data:
                         for player in team_data[position_group]:
-                            converted_player = convert_api_response_to_old_format(
-                                player
-                            )
+                            converted_player = create_player_from_api_data(player)
                             team_prospects.append(converted_player)
 
                 print(f"  Found {len(team_prospects)} total prospects")
 
-                # Filter prospects using the same logic as processIntoHtml
+                # Filter prospects using the same logic as processQueryStringJSON
                 team_filtered = []
                 for p in team_prospects:
                     if predicates.all(
@@ -87,8 +81,7 @@ def manual_goalie_search():
                         ageFilter,
                         useNegAgeFilter,
                     ):
-                        newPlayer = Player(p=p)
-                        playerList.append(newPlayer)
+                        all_filtered_players.append(p)
                         team_filtered.append(p["fullName"])
 
                 print(f"  Filtered to {len(team_filtered)} players: {team_filtered}")
@@ -97,19 +90,28 @@ def manual_goalie_search():
         except Exception as e:
             print(f"  Error: {e}")
 
-    print(f"\nTotal players after filtering: {len(playerList)}")
+    print(f"\nTotal players after filtering: {len(all_filtered_players)}")
 
-    # Process results
-    if playerList:
-        results = []
-        sorted_players = sort(playerList, filterName="-NAME")
-        processPlayers(sorted_players, results)
-
-        print(f"Final results: {len(results)} lines")
-        for i, line in enumerate(results[:20]):
-            print(f"  {i+1}: {line}")
+    # Display results
+    if all_filtered_players:
+        print(f"Manual search found {len(all_filtered_players)} goalies:")
+        for i, player in enumerate(all_filtered_players):
+            print(f"  {i+1}: {player.get('fullName')} - {player.get('primaryPosition', {}).get('abbreviation')}")
     else:
         print("No players found!")
+
+    # Compare with processQueryStringJSON
+    print("\nComparing with processQueryStringJSON('-POS G'):")
+    try:
+        result = processQueryStringJSON("-POS G")
+        players = result.get("players", [])
+        print(f"processQueryStringJSON found {len(players)} goalies")
+        if len(players) > 0:
+            print("First 5 from processQueryStringJSON:")
+            for i, player in enumerate(players[:5]):
+                print(f"  {i+1}: {player.get('fullName')} - {player.get('primaryPosition', {}).get('abbreviation')}")
+    except Exception as e:
+        print(f"Error with processQueryStringJSON: {e}")
 
 
 if __name__ == "__main__":

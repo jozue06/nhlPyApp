@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 
-from queryParser import processIntoHtml
+from queryParser import processQueryStringJSON
 
 
 def test_goalies():
     print("Testing goalies query...")
     try:
-        result = processIntoHtml("-POS G")
-        print(f"Found {len(result)} result lines")
-        if result:
-            print("All lines:")
-            for i, line in enumerate(result):
-                print(f"  {i+1}: {repr(line)}")
+        result = processQueryStringJSON("-POS G")
+        players = result.get("players", [])
+        print(f"Found {len(players)} goalies")
+        if players:
+            print("First 5 goalies:")
+            for i, player in enumerate(players[:5]):
+                print(f"  {i+1}: {player.get('fullName')} - {player.get('primaryPosition', {}).get('abbreviation')}")
         else:
             print("No results found")
     except Exception as e:
         print(f"Error: {e}")
         import traceback
-
         traceback.print_exc()
 
 
@@ -26,9 +26,7 @@ def test_limited_goalies():
     try:
         # Test one team manually first
         import requests
-
-        from processPlayers import processPlayers
-        from queryParser import Player, convert_api_response_to_old_format
+        from queryParser import create_player_from_api_data
 
         response = requests.get("https://api-web.nhle.com/v1/prospects/TOR")
         if response.status_code == 200:
@@ -36,34 +34,29 @@ def test_limited_goalies():
             goalies = []
             if "goalies" in data:
                 for player in data["goalies"]:
-                    converted = convert_api_response_to_old_format(player)
-                    goalies.append(Player(p=converted))
+                    converted = create_player_from_api_data(player)
+                    goalies.append(converted)
 
             print(f"Found {len(goalies)} goalies from TOR")
-
-            # Test processPlayers function
-            test_results = []
-            processPlayers(goalies, test_results)
-            print(f"ProcessPlayers generated {len(test_results)} lines")
-            for i, line in enumerate(test_results[:10]):
-                print(f"  {i+1}: {line}")
+            for i, goalie in enumerate(goalies[:5]):
+                print(f"  {i+1}: {goalie.get('fullName')} - {goalie.get('primaryPosition', {}).get('abbreviation')}")
 
     except Exception as e:
         print(f"Error: {e}")
         import traceback
-
         traceback.print_exc()
 
 
 def test_centers():
     print("\nTesting centers query...")
     try:
-        result = processIntoHtml("-POS C")
-        print(f"Found {len(result)} result lines")
-        if result:
-            print("First 3 lines:")
-            for i, line in enumerate(result[:3]):
-                print(f"  {i+1}: {line}")
+        result = processQueryStringJSON("-POS C")
+        players = result.get("players", [])
+        print(f"Found {len(players)} centers")
+        if players:
+            print("First 3 centers:")
+            for i, player in enumerate(players[:3]):
+                print(f"  {i+1}: {player.get('fullName')} - {player.get('primaryPosition', {}).get('abbreviation')}")
     except Exception as e:
         print(f"Error: {e}")
 

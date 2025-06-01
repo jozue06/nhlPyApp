@@ -4,7 +4,7 @@ import os
 from flask import Flask, Response, render_template, request, send_from_directory
 from flask_cors import CORS
 
-from queryParser import processIntoHtml, processQueryStringJSON
+from queryParser import processQueryStringJSON
 
 app = Flask(__name__, static_url_path="/static", static_folder="static")
 
@@ -34,7 +34,7 @@ def indexHtml():
 @app.route("/api/html/search", methods=["POST"])
 def searchHtml():
     queryString = request.form.get("queryString")
-    results = processIntoHtml(queryString)
+    results = processQueryStringJSON(queryString)
     return render_template("index.html", results=results)
 
 

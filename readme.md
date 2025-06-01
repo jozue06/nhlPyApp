@@ -14,16 +14,9 @@ A comprehensive Python application for exploring NHL prospect data, featuring bo
 - **Rank Filters**: Search by draft rankings (when available)
 - **Combined Filters**: Mix and match any filters for precise searches
 
-### 📊 **Data Coverage**
-
-- **~702 Total Prospects** across all 32 NHL teams
-- **Real-time Data** from official NHL API endpoints
-- **Comprehensive Info**: Player stats, physical attributes, birth details, and more
-- **Multiple Interfaces**: Terminal commands, Flask web app, and React frontend
-
 ### 🖥️ **Multiple Interfaces**
 
-1. **Python Terminal**: Direct command-line interface for power users
+1. **Python Terminal**: Direct command-line looking interface for power users
 2. **Flask Web App**: Server-rendered HTML interface
 3. **React SPA**: Modern single-page application with dynamic UI
 
@@ -45,7 +38,7 @@ cd nhlPyApp
 
 This will automatically:
 
-- ✅ Start Python Flask server on port 5000
+- ✅ Start Python Flask server on port 5001
 - ✅ Start React development server on port 3000
 - ✅ Configure API endpoints dynamically
 - ✅ Install missing dependencies
@@ -56,22 +49,18 @@ This will automatically:
 #### Python Backend Setup
 
 ```bash
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-
 # Install Python dependencies
 pip install -r requirements.txt
 
 # Start Flask server
-python app.py
+python backend/app.py
 ```
 
 #### React Frontend Setup
 
 ```bash
 # Navigate to React app
-cd app
+cd frontend
 
 # Install Node dependencies
 npm install
@@ -176,8 +165,8 @@ npm start
 
 ### **Architecture**
 
-- **Backend**: Python 3.8+ with Flask web framework
-- **Frontend**: React 17+ with Axios for API calls
+- **Backend**: Python 3.11+ with Flask web framework
+- **Frontend**: React 17+ with fetch for API calls
 - **Data Source**: Official NHL Prospects API (`api-web.nhle.com`)
 - **Filtering**: Custom predicate system with boolean logic
 - **Sorting**: Multi-criteria sorting with fallback mechanisms
@@ -185,17 +174,16 @@ npm start
 ### **API Integration**
 
 - **32 Team Endpoints**: Loops through all NHL team abbreviations
-- **Data Transformation**: Converts new API format to legacy-compatible structure
 - **Error Handling**: Graceful handling of API failures and missing data
 - **Rate Limiting**: Respectful API usage with proper delays
 
 ### **Key Files**
 
-- `app.py` - Flask web server and API routes
-- `queryParser.py` - Main query processing and API integration
-- `predicates.py` - Filter logic and boolean operations
-- `sorting.py` - Multi-criteria sorting algorithms
-- `utils.py` - Helper functions for data conversion
+- `backend/app.py` - Flask web server and API routes
+- `backend/queryParser.py` - Main query processing and API integration
+- `backend/predicates.py` - Filter logic and boolean operations
+- `backend/sorting.py` - Multi-criteria sorting algorithms
+- `backend/utils.py` - Helper functions for data conversion
 - `frontend/src/Form.tsx` - React frontend component
 
 ## 🌐 Deployment
@@ -207,22 +195,22 @@ npm start
 
 ### **Local URLs (when running)**
 
-- **Python Backend API**: http://127.0.0.1:5000
-- **Flask Web App**: http://127.0.0.1:5000
-- **Flask React Served**: http://127.0.0.1:5000/react
+- **Python Backend API**: http://127.0.0.1:5001
+- **Flask Web App**: http://127.0.0.1:5001
+- **Flask React Served**: http://127.0.0.1:5001/react
 - **React Dev Server**: http://localhost:3000
 
 ## 🧪 Testing
 
 ```bash
 # Run comprehensive filter test suite
-python3 test_all_filters.py
+python3 backend/test_all_filters.py
 
 # Quick demo of key filters
-python3 quick_test_demo.py
+python3 backend/quick_test_demo.py
 
 # Manual testing
-python3 -c "from queryParser import processIntoHtml; print(processIntoHtml('-POS G'))"
+python3 -c "from backend.queryParser import processQueryStringJSON; import json; print(json.dumps(processQueryStringJSON('-POS G'), indent=2))"
 ```
 
 ## 📝 Recent Updates

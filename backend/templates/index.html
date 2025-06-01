@@ -7,27 +7,27 @@
 				const cleanName = playerName.trim();
 				const infoDiv = document.getElementById(`infos-${cleanName.replace(/\s+/g, '-')}`);
 				const button = document.getElementById(`btn-${cleanName.replace(/\s+/g, '-')}`);
-				
+
 				if (!playerStates[cleanName]) {
 					playerStates[cleanName] = { loaded: false, visible: false };
 				}
-				
+
 				const state = playerStates[cleanName];
-				
+
 				if (!state.loaded) {
 					try {
 						button.textContent = 'Loading...';
 						button.disabled = true;
-						
+
 						const linkName = cleanName.replace(/\s+/g, '+');
 						const response = await fetch(`https://autocomplete.eliteprospects.com/all?q=${linkName}`);
 						const json = await response.json();
-						
+
 						if (!json || json.length === 0) {
 							infoDiv.innerHTML = '<p style="color: #ff6b6b; padding: 10px;">No player information found</p>';
 						} else {
 							const found = json.length === 1 ? json[0] : json.find(e => e.fullname === cleanName);
-							
+
 							if (!found || !found.id) {
 								infoDiv.innerHTML = `<p style="color: #ff6b6b; padding: 10px;">Player "${cleanName}" not found.</p>`;
 							} else {
@@ -39,12 +39,12 @@
 								infoDiv.appendChild(iframe);
 							}
 						}
-						
+
 						state.loaded = true;
 						state.visible = true;
 						button.textContent = 'Hide Info';
 						button.style.backgroundColor = '#ff6b6b';
-						
+
 					} catch (error) {
 						infoDiv.innerHTML = '<p style="color: #ff6b6b; padding: 10px;">Error loading player information. Please try again.</p>';
 						state.loaded = true;
@@ -52,12 +52,12 @@
 						button.textContent = 'Hide Info';
 						button.style.backgroundColor = '#ff6b6b';
 					}
-					
+
 					button.disabled = false;
 				} else {
 					const iframe = infoDiv.querySelector('iframe');
 					const errorMsg = infoDiv.querySelector('p');
-					
+
 					if (state.visible) {
 						if (iframe) {
 							iframe.style.display = 'none';
@@ -89,44 +89,93 @@
 				<input type="submit">
 			</form>
 		</div>
+
 		{% if results %}
-			{% set total_players = [] %}
-			{% for res in results %}
-				{% if res and 'Player Full Name:' in res %}
-					{% set _ = total_players.append(1) %}
-				{% endif %}
-			{% endfor %}
-			{% if total_players | length > 0 %}
+			<!-- Handle help response -->
+			{% if results.isHelp %}
 				<div style="color: #00ff00; padding: 10px; margin: 10px 0; font-weight: bold; text-align: center;">
-					Total Players Found: {{ total_players | length }}
+					Help Information
 				</div>
+				<ul>
+					{% for message in results.messages %}
+						<li style="color: #00ff00; padding: 5px;">{{ message }}</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<!-- Display filter information -->
+				{% if results.filterInfo %}
+					<div style="color: #ffff00; padding: 10px; margin: 10px 0; border: 1px solid #ffff00; border-radius: 5px; background-color: #1a1a1a;">
+						<div style="font-weight: bold; margin-bottom: 5px;">Active Filters:</div>
+						<ul style="margin: 0; padding-left: 20px;">
+							{% for filter in results.filterInfo %}
+								<li style="margin-bottom: 3px;">{{ filter }}</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% endif %}
+
+				<!-- Display error if any -->
+				{% if results.error %}
+					<div style="color: #ff6b6b; padding: 10px; margin: 10px 0; font-weight: bold; text-align: center;">
+						{{ results.error }}
+					</div>
+				{% endif %}
+
+				<!-- Display players -->
+				{% if results.players %}
+					{% set total_players = results.players | length %}
+					{% if total_players > 0 %}
+						<div style="color: #00ff00; padding: 10px; margin: 10px 0; font-weight: bold; text-align: center;">
+							Total Players Found: {{ total_players }}
+						</div>
+					{% endif %}
+
+					{% for player in results.players %}
+						<div style="margin: 20px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+							<!-- Player headshot -->
+							{% if player.headshot %}
+								<div style="margin: 10px 0;">
+									<img src="{{ player.headshot }}"
+										 alt="Player headshot"
+										 style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px; border: 2px solid #00ff00;"
+										 onerror="this.style.display='none';">
+								</div>
+							{% endif %}
+
+							<!-- Player information -->
+							<p style="color: aqua !important;">Player NHL ID: {{ player.id }}</p>
+							<p style="color: aqua !important;">
+								Player Full Name: {{ player.fullName }}
+								{% if player.fullName %}
+									{% set safe_id = player.fullName.replace(' ', '-') %}
+									<button id="btn-{{ safe_id }}"
+											onclick="toggleInfo('{{ player.fullName }}')"
+											style="margin-left: 10px; padding: 5px 10px; background-color: #4ecdc4; color: white; border: none; border-radius: 3px; cursor: pointer;">
+										Get Info
+									</button>
+									<div id="infos-{{ safe_id }}" style="margin: 10px 0;"></div>
+								{% endif %}
+							</p>
+							<p style="color: aqua !important;">Player Birth Date: {{ player.birthDate or 'N/A' }}</p>
+							<p style="color: aqua !important;">Player Current Age: {{ player.age or 'N/A' }}</p>
+							<p style="color: aqua !important;">Player Height: {{ player.height or 'N/A' }}</p>
+							<p style="color: aqua !important;">Player Weight: {{ (player.weight ~ 'lbs') if player.weight else 'N/A' }}</p>
+							<p style="color: aqua !important;">Player Birth Country: {{ player.birthCountry or 'N/A' }}</p>
+							<p style="color: aqua !important;">Player Position: {{ player.primaryPosition.name if player.primaryPosition else 'N/A' }}</p>
+
+							<!-- Handle shot/glove hand based on position -->
+							{% if player.primaryPosition and player.primaryPosition.abbreviation == 'G' %}
+								<p style="color: aqua !important;">Player Glove Hand: {{ player.shootsCatches or 'N/A' }}</p>
+							{% else %}
+								<p style="color: aqua !important;">Player Shot Hand: {{ player.shootsCatches or 'N/A' }}</p>
+							{% endif %}
+
+							<p style="color: aqua !important;">Player Draft Eligibility: {{ player.draftStatus or 'N/A' }}</p>
+							<p style="color: aqua !important;">Player Midterm Rank: not currently ranked</p>
+							<p style="color: aqua !important;">Player Final Rank: not currently ranked</p>
+						</div>
+					{% endfor %}
+				{% endif %}
 			{% endif %}
 		{% endif %}
-		{% for res in results %}
-			{% if res and 'Player Headshot:' in res and 'http' in res %}
-				{% set headshot_url = res.split('Player Headshot: ')[1] %}
-				<div style="margin: 10px 0;">
-					<img src="{{ headshot_url }}" 
-						 alt="Player headshot" 
-						 style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px; border: 2px solid #00ff00;"
-						 onerror="this.style.display='none';">
-				</div>
-			{% elif res and 'Player Full Name:' in res %}
-				{% set player_name = res.split('Player Full Name: ')[1] %}
-				{% set safe_id = player_name.replace(' ', '-') %}
-				<p style="color: aqua !important;">
-					{{ res }}
-					<button id="btn-{{ safe_id }}" 
-							onclick="toggleInfo('{{ player_name }}')"
-							style="margin-left: 10px; padding: 5px 10px; background-color: #4ecdc4; color: white; border: none; border-radius: 3px; cursor: pointer;">
-						Get Info
-					</button>
-				</p>
-				<div id="infos-{{ safe_id }}" style="margin: 10px 0;"></div>
-			{% elif res and 'Player Headshot:' not in res %}
-				<p style="color: aqua !important;">
-					{{ res }}
-				</p>
-			{% endif %}
-		{% endfor %}
 	{% endblock %}

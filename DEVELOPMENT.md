@@ -19,7 +19,7 @@
 
 ### **start-dev.sh**
 
-- ✅ Starts Python Flask server (port 5000)
+- ✅ Starts Python Flask server (port 5001)
 - ✅ Starts React development server (port 3000)
 - ✅ Auto-configures API endpoints
 - ✅ Installs missing dependencies
@@ -39,25 +39,21 @@
 ### Python Setup
 
 ```bash
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-
 # Install dependencies
 pip install -r requirements.txt
 
 # Run Flask server
-python app.py
+python backend/app.py
 
 # Run tests
-python3 test_all_filters.py
+python3 backend/test_all_filters.py
 ```
 
 ### React Setup
 
 ```bash
 # Navigate to React app
-cd app
+cd frontend
 
 # Install dependencies
 npm install
@@ -73,9 +69,9 @@ npm run build
 
 ### Local Development
 
-- **Python Backend**: http://127.0.0.1:5000
-- **Flask Web App**: http://127.0.0.1:5000
-- **Flask React**: http://127.0.0.1:5000/react
+- **Python Backend**: http://127.0.0.1:5001
+- **Flask Web App**: http://127.0.0.1:5001
+- **Flask React**: http://127.0.0.1:5001/react
 - **React Dev Server**: http://localhost:3000
 
 ### Production/Remote
@@ -87,7 +83,7 @@ npm run build
 
 The React frontend can work with either:
 
-1. **Local Backend**: `http://127.0.0.1:5000` (when running Flask locally)
+1. **Local Backend**: `http://127.0.0.1:5001` (when running Flask locally)
 2. **Remote Backend**: `https://nhl-terminal.herokuapp.com` (production Heroku app)
 
 Configuration is handled by `frontend/src/apiConfig.js` (auto-generated).
@@ -97,7 +93,7 @@ Configuration is handled by `frontend/src/apiConfig.js` (auto-generated).
 ### Common Issues
 
 1. **Port 3000 already in use**: Kill existing React processes or use different port
-2. **Port 5000 already in use**: Kill existing Flask processes
+2. **Port 5001 already in use**: Kill existing Flask processes
 3. **Missing dependencies**: Run the respective install commands
 4. **Permission denied**: Make sure scripts are executable (`chmod +x`)
 
@@ -105,8 +101,8 @@ Configuration is handled by `frontend/src/apiConfig.js` (auto-generated).
 
 ```bash
 # Clean React build
-cd app && rm -rf node_modules build && npm install
+cd frontend && rm -rf node_modules build && npm install
 
 # Reset Python environment
-deactivate && rm -rf .venv && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+pip install -r requirements.txt
 ```

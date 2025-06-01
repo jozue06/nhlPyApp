@@ -1,21 +1,11 @@
-import { useMemo, useState, useCallback, SyntheticEvent } from "react";
+import { SyntheticEvent, useMemo, useCallback, useState } from "react";
 
 const PlayerInfo = ({ playerData }: { playerData: any }) => {
-  const [infoVisible, setInfoVisible] = useState<boolean>(false);
-  const [infoLoaded, setInfoLoaded] = useState<boolean>(false);
+  const [infoVisible, setInfoVisible] = useState(false);
+  const [infoLoaded, setInfoLoaded] = useState(false);
 
-  // Helper function to calculate age from birth date
-  const calculateAge = (birthDate: string) => {
-    if (!birthDate) return 0;
-    const birth = new Date(birthDate);
-    const now = new Date();
-    let age = now.getFullYear() - birth.getFullYear();
-    const monthDiff = now.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-      age--;
-    }
-    return age;
-  };
+  // Use age from API response instead of calculating it
+  const age = playerData.age || "N/A";
 
   const toggleInfo = useCallback(async () => {
     const infoDiv = document.getElementById(
@@ -24,79 +14,66 @@ const PlayerInfo = ({ playerData }: { playerData: any }) => {
 
     if (!infoLoaded) {
       try {
-        const linkName = playerData.fullName.replace(" ", "+");
-        const href = `https://autocomplete.eliteprospects.com/all?q=${linkName}`;
-        const data = await fetch(href);
-        const json = await data.json();
+        const linkName = playerData.fullName.replace(/\s+/g, "+");
+        const response = await fetch(
+          `https://autocomplete.eliteprospects.com/all?q=${linkName}`
+        );
+        const json = await response.json();
 
         if (!json || json.length === 0) {
           infoDiv.innerHTML =
             '<p style="color: #ff6b6b; padding: 10px;">No player information found</p>';
-          setInfoLoaded(true);
-          setInfoVisible(true);
-          return;
+        } else {
+          const found =
+            json.length === 1
+              ? json[0]
+              : json.find((e: any) => e.fullname === playerData.fullName);
+
+          if (!found || !found.id) {
+            infoDiv.innerHTML = `<p style="color: #ff6b6b; padding: 10px;">Player "${playerData.fullName}" not found.</p>`;
+          } else {
+            const iframe = document.createElement("iframe");
+            iframe.src = `https://www.eliteprospects.com/ajax/player.stats.default?playerId=${found.id}`;
+            iframe.style.minWidth = "70vw";
+            iframe.style.backgroundColor = "darkgray";
+            iframe.style.border = "1px solid #00ff00";
+            infoDiv.appendChild(iframe);
+          }
         }
 
-        const found =
-          json.length === 1
-            ? json[0]
-            : json.find((e: any) => e.fullname === playerData.fullName);
-
-        if (!found || !found.id) {
-          infoDiv.innerHTML = `<p style="color: #ff6b6b; padding: 10px;">Player "${playerData.fullName.trim()}" not found.</p>`;
-          setInfoLoaded(true);
-          setInfoVisible(true);
-          return;
-        }
-
-        const id = found.id;
-
-        const iframe = document.createElement("iframe");
-        iframe.src = `https://www.eliteprospects.com/ajax/player.stats.default?playerId=${id}`;
-        iframe.id = `iframe-${playerData.fullName}`;
-        iframe.style.minWidth = "70vw";
-        iframe.style.backgroundColor = "darkgray";
-
-        infoDiv.appendChild(iframe);
         setInfoLoaded(true);
         setInfoVisible(true);
-      } catch {
+      } catch (error) {
         infoDiv.innerHTML =
           '<p style="color: #ff6b6b; padding: 10px;">Error loading player information. Please try again.</p>';
         setInfoLoaded(true);
         setInfoVisible(true);
       }
     } else {
-      const iframe = document.getElementById(
-        `iframe-${playerData.fullName}`
-      ) as HTMLIFrameElement;
-      const errorMessage = infoDiv.querySelector("p") as HTMLParagraphElement;
+      const iframe = infoDiv.querySelector("iframe");
+      const errorMsg = infoDiv.querySelector("p");
 
-      if (iframe || errorMessage) {
-        if (infoVisible) {
-          if (iframe) {
-            iframe.style.display = "none";
-          }
-          if (errorMessage) {
-            errorMessage.style.display = "none";
-          }
-          setInfoVisible(false);
-        } else {
-          if (iframe) {
-            iframe.style.display = "block";
-          }
-          if (errorMessage) {
-            errorMessage.style.display = "block";
-          }
-          setInfoVisible(true);
+      if (infoVisible) {
+        if (iframe) {
+          (iframe as HTMLElement).style.display = "none";
         }
+        if (errorMsg) {
+          (errorMsg as HTMLElement).style.display = "none";
+        }
+        setInfoVisible(false);
+      } else {
+        if (iframe) {
+          (iframe as HTMLElement).style.display = "block";
+        }
+        if (errorMsg) {
+          (errorMsg as HTMLElement).style.display = "block";
+        }
+        setInfoVisible(true);
       }
     }
   }, [playerData.fullName, infoLoaded, infoVisible]);
 
   const playerDisplay = useMemo(() => {
-    const age = calculateAge(playerData.birthDate);
-
     return (
       <div
         style={{
@@ -197,7 +174,7 @@ const PlayerInfo = ({ playerData }: { playerData: any }) => {
         <div id={`infos${playerData.fullName}`}></div>
       </div>
     );
-  }, [playerData, infoVisible, infoLoaded, toggleInfo]);
+  }, [playerData, infoVisible, infoLoaded, toggleInfo, age]);
 
   return <>{playerDisplay}</>;
 };
