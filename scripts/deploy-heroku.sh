@@ -86,6 +86,29 @@ if [ "$BACKEND_MODE" = "go" ]; then
     echo ""
     echo -e "${GREEN}🐹 Preparing Go backend for deployment...${NC}"
 
+    # Build React frontend locally for Go deployment
+    echo -e "${BLUE}⚛️  Building React TypeScript frontend...${NC}"
+    cd frontend
+
+    # Check if node_modules exists
+    if [ ! -d "node_modules" ]; then
+        echo -e "${BLUE}📦 Installing frontend dependencies...${NC}"
+        npm install
+    fi
+
+    # Build for production
+    echo -e "${BLUE}🔨 Building for production...${NC}"
+    npm run build
+
+    # Check if build was successful
+    if [ ! -d "build" ]; then
+        echo -e "${RED}❌ Frontend build failed - build directory not found${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}✅ Frontend build completed successfully${NC}"
+    cd ..
+
     # Copy Go files to root for Heroku deployment
     echo -e "${BLUE}📝 Setting up Go files for Heroku...${NC}"
     cp backend/go/go.mod .
@@ -99,12 +122,12 @@ if [ "$BACKEND_MODE" = "go" ]; then
     # Create Procfile for Go
     echo "web: ./bin/nhl-app" > Procfile
 
-    # Configure Go buildpack only - React will be built by bin/post_compile
+    # Configure Go buildpack only - React already built locally
     echo -e "${BLUE}🔧 Configuring Go buildpack...${NC}"
     heroku buildpacks:clear --app nhl-terminal || true
     heroku buildpacks:add heroku/go --app nhl-terminal
 
-    echo -e "${BLUE}📝 Using bin/post_compile script for React building${NC}"
+    echo -e "${BLUE}📝 React frontend built locally and ready for deployment${NC}"
     echo -e "${GREEN}✅ Go backend preparation completed${NC}"
 
 elif [ "$BACKEND_MODE" = "python" ]; then
