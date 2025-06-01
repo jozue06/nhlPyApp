@@ -97,7 +97,7 @@ if [ "$BACKEND_MODE" = "go" ]; then
     rm -f main.go.bak
 
     # Create Procfile for Go
-    echo "web: ./nhl-app" > Procfile
+    echo "web: ./bin/nhl-app" > Procfile
 
     # Configure Go buildpack only - React will be built by bin/post_compile
     echo -e "${BLUE}🔧 Configuring Go buildpack...${NC}"

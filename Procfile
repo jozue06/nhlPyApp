@@ -1,1 +1,1 @@
-web: ./nhl-app
+web: ./bin/nhl-app
