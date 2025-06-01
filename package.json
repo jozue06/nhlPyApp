@@ -1,0 +1,13 @@
+{
+  "name": "nhl-terminal-app",
+  "version": "1.0.0",
+  "description": "NHL Player Search Terminal App",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "heroku-postbuild": "cd frontend && npm install && npm run build"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
