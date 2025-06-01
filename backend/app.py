@@ -11,15 +11,19 @@ app = Flask(__name__, static_url_path="/static", static_folder="static")
 # Enable CORS for all domains on all routes
 CORS(app)
 
+# Get the correct path to the React build directory
+# In Heroku, we need to go up one level from backend/ to get to frontend/build
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REACT_BUILD_DIR = os.path.join(BASE_DIR, 'frontend', 'build')
 
 @app.route("/react", methods=["GET"])
 def indexReact():
-    return send_from_directory("../frontend/build", "index.html")
+    return send_from_directory(REACT_BUILD_DIR, "index.html")
 
 
 @app.route("/assets/<path:filename>", methods=["GET"])
 def reactAssets(filename):
-    return send_from_directory("../frontend/build/assets", filename)
+    return send_from_directory(os.path.join(REACT_BUILD_DIR, "assets"), filename)
 
 
 @app.route("/", methods=["GET"])
