@@ -4,6 +4,10 @@ body {
   padding: 3rem;
 }
 
+.App {
+  text-align: center;
+}
+
 textarea {
   caret-color: green !important;
   color: green !important;
@@ -23,9 +27,11 @@ textarea:focus-visible {
 .input-wrapper {
   margin-left: 80px;
 }
+
 ul {
   list-style-type: none !important;
 }
+
 code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;

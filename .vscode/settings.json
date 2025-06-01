@@ -54,7 +54,7 @@
   },
 
   // ESLint settings
-  "eslint.workingDirectories": ["app"],
+  "eslint.workingDirectories": ["frontend"],
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -63,8 +63,8 @@
   ],
 
   // Prettier settings
-  "prettier.configPath": "./app/.prettierrc",
-  "prettier.ignorePath": "./app/.prettierignore",
+  "prettier.configPath": "./frontend/.prettierrc",
+  "prettier.ignorePath": "./frontend/.prettierignore",
 
   // File associations
   "files.associations": {

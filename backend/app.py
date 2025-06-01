@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 from queryParser import processIntoHtml
 
-app = Flask(__name__, static_url_path="", static_folder="app/build")
+app = Flask(__name__, static_url_path="", static_folder="../frontend/build")
 
 # Enable CORS for all domains on all routes
 CORS(app)

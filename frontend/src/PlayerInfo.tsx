@@ -1,13 +1,17 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, SyntheticEvent } from "react";
 
-export default function PlayerName(props) {
-  const [href, setHref] = useState("");
-  const [pName, setPName] = useState("");
-  const [infoVisible, setInfoVisible] = useState(false);
-  const [infoLoaded, setInfoLoaded] = useState(false);
+interface PlayerInfoProps {
+  playerData: any;
+}
+
+const PlayerInfo = ({ playerData }: PlayerInfoProps) => {
+  const [href, setHref] = useState<string>("");
+  const [pName, setPName] = useState<string>("");
+  const [infoVisible, setInfoVisible] = useState<boolean>(false);
+  const [infoLoaded, setInfoLoaded] = useState<boolean>(false);
 
   const toggleInfo = useCallback(async () => {
-    const infoDiv = document.getElementById(`infos${pName}`);
+    const infoDiv = document.getElementById(`infos${pName}`) as HTMLDivElement;
 
     if (!infoLoaded) {
       try {
@@ -23,7 +27,9 @@ export default function PlayerName(props) {
         }
 
         const found =
-          json.length === 1 ? json[0] : json.find((e) => e.fullname === pName);
+          json.length === 1
+            ? json[0]
+            : json.find((e: any) => e.fullname === pName);
 
         if (!found || !found.id) {
           infoDiv.innerHTML = `<p style="color: #ff6b6b; padding: 10px;">Player "${pName.trim()}" not found.</p>`;
@@ -43,15 +49,17 @@ export default function PlayerName(props) {
         infoDiv.appendChild(iframe);
         setInfoLoaded(true);
         setInfoVisible(true);
-      } catch (error) {
+      } catch {
         infoDiv.innerHTML =
           '<p style="color: #ff6b6b; padding: 10px;">Error loading player information. Please try again.</p>';
         setInfoLoaded(true);
         setInfoVisible(true);
       }
     } else {
-      const iframe = document.getElementById(`iframe-${pName}`);
-      const errorMessage = infoDiv.querySelector("p");
+      const iframe = document.getElementById(
+        `iframe-${pName}`
+      ) as HTMLIFrameElement;
+      const errorMessage = infoDiv.querySelector("p") as HTMLParagraphElement;
 
       if (iframe || errorMessage) {
         if (infoVisible) {
@@ -77,10 +85,10 @@ export default function PlayerName(props) {
 
   const getName = useMemo(() => {
     if (
-      props?.playerData.includes("Player Headshot:") &&
-      props?.playerData.includes("http")
+      playerData?.includes("Player Headshot:") &&
+      playerData?.includes("http")
     ) {
-      const headshotUrl = props.playerData.split("Player Headshot: ")[1];
+      const headshotUrl = playerData.split("Player Headshot: ")[1];
       return (
         <div
           style={{
@@ -99,20 +107,20 @@ export default function PlayerName(props) {
               borderRadius: "5px",
               border: "2px solid #00ff00",
             }}
-            onError={(e) => {
-              e.target.style.display = "none";
+            onError={(e: SyntheticEvent<HTMLImageElement>) => {
+              (e.target as HTMLImageElement).style.display = "none";
             }}
           />
         </div>
       );
-    } else if (props?.playerData.includes("Player Full Name")) {
-      const name = props.playerData.split(":")[1];
+    } else if (playerData?.includes("Player Full Name")) {
+      const name = playerData.split(":")[1];
       const linkName = name.replace("%20", "+");
       setHref(`https://autocomplete.eliteprospects.com/all?q=${linkName}`);
       setPName(name.trim());
       return (
         <>
-          {props.playerData}
+          {playerData}
           <button
             onClick={toggleInfo}
             style={{
@@ -133,8 +141,11 @@ export default function PlayerName(props) {
         </>
       );
     } else {
-      return <>{props.playerData}</>;
+      return <>{playerData}</>;
     }
-  }, [props, infoVisible, infoLoaded, pName, toggleInfo]);
+  }, [playerData, infoVisible, infoLoaded, pName, toggleInfo]);
+
   return <>{getName}</>;
-}
+};
+
+export default PlayerInfo;
