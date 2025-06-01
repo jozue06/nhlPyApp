@@ -8,11 +8,11 @@ import {
 } from "react";
 import ResultList from "./ResultList";
 
-interface FormState {
+type FormState = {
   value: string;
   data: any[] | null;
   loading: boolean;
-}
+};
 
 export const Form = () => {
   const [state, setState] = useState<FormState>({
