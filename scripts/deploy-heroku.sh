@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # NHL Prospects App - Heroku Deployment Script
-# This script builds the React frontend and deploys the Python/Flask backend to Heroku
+# This script deploys the Python/Flask backend to Heroku with automatic React building
 
 set -e  # Exit on error
 
@@ -16,7 +16,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}🏒 NHL Prospects App - Heroku Deployment${NC}"
-echo -e "${BLUE}=========================================${NC}"
+echo -e "${BLUE}========================================${NC}"
 echo ""
 
 # Check if we're in the right directory
@@ -41,35 +41,26 @@ if [ -n "$(git status --porcelain)" ]; then
     fi
 fi
 
-# Build React frontend for production
-echo -e "${GREEN}⚛️  Building React TypeScript frontend...${NC}"
-cd frontend
+# Clean up any deployment files
+echo -e "${BLUE}🧹 Cleaning up deployment files...${NC}"
+rm -f main.go go.mod go.sum *.go 2>/dev/null || true
 
-# Check if node_modules exists
-if [ ! -d "node_modules" ]; then
-    echo -e "${BLUE}📦 Installing frontend dependencies...${NC}"
-    npm install
-fi
+# Prepare Python backend deployment
+echo ""
+echo -e "${GREEN}🐍 Preparing Python backend for deployment...${NC}"
 
-# Build for production
-echo -e "${BLUE}🔨 Building for production...${NC}"
-npm run build
+# Create Procfile for Python
+echo "web: cd backend && gunicorn app:app --bind 0.0.0.0:\$PORT" > Procfile
 
-# Check if build was successful
-if [ ! -d "build" ]; then
-    echo -e "${RED}❌ Frontend build failed - build directory not found${NC}"
-    exit 1
-fi
+# Python backend uses the bin/post_compile script to build React
+echo -e "${BLUE}📝 Using bin/post_compile script for React building${NC}"
+echo -e "${BLUE}🔧 Heroku will auto-detect Python buildpack from requirements.txt${NC}"
 
-echo -e "${GREEN}✅ Frontend build completed successfully${NC}"
-echo -e "${GREEN}   Build output: frontend/build/${NC}"
-
-# Go back to root directory
-cd ..
+echo -e "${GREEN}✅ Python backend preparation completed${NC}"
 
 # Deploy to Heroku
 echo ""
-echo -e "${GREEN}🚀 Deploying to Heroku...${NC}"
+echo -e "${GREEN}🚀 Deploying Python backend to Heroku...${NC}"
 
 # Check if heroku remote exists
 if ! git remote | grep -q heroku; then
@@ -78,18 +69,32 @@ if ! git remote | grep -q heroku; then
     exit 1
 fi
 
+# Add changes to git
+echo -e "${BLUE}📦 Adding deployment files to git...${NC}"
+git add .
+git commit -m "Deploy Python backend with automatic React building" || echo "No changes to commit"
+
 # Push to Heroku
-echo -e "${BLUE}📤 Pushing to Heroku master...${NC}"
-git push heroku master
+echo -e "${BLUE}📤 Pushing to Heroku...${NC}"
+git push heroku HEAD:main
 
 echo ""
-echo -e "${GREEN}🎉 Deployment completed!${NC}"
+echo -e "${GREEN}🎉 Python backend deployment completed!${NC}"
 echo ""
 echo -e "${BLUE}🌐 Your app should be available at:${NC}"
-echo -e "${GREEN}   https://$(heroku apps:info --json | jq -r '.app.web_url' | sed 's|https://||' | sed 's|/$||').herokuapp.com${NC}"
+heroku_url=$(heroku apps:info --json 2>/dev/null | jq -r '.app.web_url' 2>/dev/null || echo "")
+if [ -n "$heroku_url" ] && [ "$heroku_url" != "null" ]; then
+    echo -e "${GREEN}   $heroku_url${NC}"
+else
+    echo -e "${GREEN}   Run 'heroku open' to view your app${NC}"
+fi
 echo ""
 echo -e "${YELLOW}💡 Useful commands:${NC}"
-echo -e "${YELLOW}   heroku logs --tail${NC}    # View live logs"
-echo -e "${YELLOW}   heroku open${NC}           # Open app in browser"
-echo -e "${YELLOW}   heroku ps${NC}             # Check dyno status"
+echo -e "${YELLOW}   heroku logs --tail${NC}              # View live logs"
+echo -e "${YELLOW}   heroku open${NC}                     # Open app in browser"
+echo -e "${YELLOW}   heroku ps${NC}                       # Check dyno status"
+echo ""
+echo -e "${BLUE}🎯 React frontend built automatically during deployment${NC}"
+echo -e "${BLUE}   React app accessible at: /react${NC}"
+echo -e "${BLUE}   API endpoints at: /api/json/search${NC}"
 echo ""

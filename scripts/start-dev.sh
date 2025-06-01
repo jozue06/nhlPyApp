@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # NHL Prospects App - Development Startup Script
-# This script starts both the Python Flask backend and React TypeScript frontend with Vite
+# This script starts the Python Flask backend and React TypeScript frontend with Vite
 
 set -e  # Exit on error
 
@@ -16,12 +16,33 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Configuration
-PYTHON_PORT=5000
+PYTHON_PORT=5001
 REACT_PORT=3000
-API_MODE=${1:-"local"}  # Default to local, can pass "remote" as first argument
+API_MODE=${1:-"local"}       # Default to local, can pass "remote" as first argument
 
 echo -e "${BLUE}🏒 NHL Prospects App - Development Startup${NC}"
 echo -e "${BLUE}=============================================${NC}"
+echo ""
+
+# Show usage
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    echo -e "${YELLOW}Usage: $0 [api_mode]${NC}"
+    echo ""
+    echo -e "${BLUE}API mode options (optional):${NC}"
+    echo -e "${GREEN}  local${NC}   - Use local Python backend (default)"
+    echo -e "${GREEN}  remote${NC}  - Use remote API (heroku)"
+    echo ""
+    echo -e "${BLUE}Examples:${NC}"
+    echo -e "${YELLOW}  $0${NC}            # Start with local Python backend"
+    echo -e "${YELLOW}  $0 local${NC}      # Start with local Python backend"
+    echo -e "${YELLOW}  $0 remote${NC}     # Use remote API"
+    echo ""
+    exit 0
+fi
+
+# Clean up any existing servers on the ports we'll use
+echo -e "${YELLOW}🧹 Cleaning up existing servers...${NC}"
+lsof -ti:3000 | xargs kill -9 2>/dev/null; lsof -ti:5000 | xargs kill -9 2>/dev/null; lsof -ti:5001 | xargs kill -9 2>/dev/null; lsof -ti:8080 | xargs kill -9 2>/dev/null; echo "Killed all servers on ports 3000, 5000, 5001, and 8080"
 echo ""
 
 # Function to cleanup background processes on exit
@@ -34,6 +55,13 @@ cleanup() {
 
 # Set up cleanup trap
 trap cleanup SIGINT SIGTERM EXIT
+
+# Validate API mode
+if [ "$API_MODE" != "local" ] && [ "$API_MODE" != "remote" ]; then
+    echo -e "${RED}❌ Error: API mode must be 'local' or 'remote'${NC}"
+    echo -e "${YELLOW}Usage: $0 [local|remote]${NC}"
+    exit 1
+fi
 
 # Check if we're in the right directory
 if [ ! -f "backend/app.py" ] || [ ! -f "backend/queryParser.py" ]; then
@@ -54,24 +82,39 @@ if [ "$API_MODE" = "remote" ]; then
     echo -e "${YELLOW}🌐 API Mode: Remote (${API_URL})${NC}"
 else
     API_URL="http://127.0.0.1:${PYTHON_PORT}"
-    echo -e "${YELLOW}🏠 API Mode: Local (${API_URL})${NC}"
+    echo -e "${YELLOW}🏠 API Mode: Local Python backend (${API_URL})${NC}"
 fi
 
-# Update React frontend to use the correct API endpoint
-echo -e "${BLUE}📝 Configuring React TypeScript frontend API endpoint...${NC}"
+# Update React frontend configuration
+echo -e "${BLUE}📝 Configuring React TypeScript frontend...${NC}"
 cd frontend/src
 
-# Create or update the API configuration for TypeScript
-cat > apiConfig.ts << EOF
-// Auto-generated API configuration
-export const API_BASE_URL: string = '${API_URL}';
-EOF
+# Create the environment variable for Vite (always false for Python backend)
+echo "VITE_USE_GO_BACKEND=false" > ../.env.development
 
 cd ../..
 
 echo ""
 
-# Start Python Flask server (only if running locally)
+# Build React app for production (needed for backend to serve static files)
+echo -e "${BLUE}⚛️  Building React TypeScript app for production...${NC}"
+cd frontend
+
+# Check if node_modules exists
+if [ ! -d "node_modules" ]; then
+    echo -e "${BLUE}📦 Installing React TypeScript dependencies...${NC}"
+    npm install
+fi
+
+# Build the React app
+echo -e "${GREEN}🏗️  Building React app...${NC}"
+npm run build
+
+cd ..
+
+echo ""
+
+# Start backend server (only if running locally)
 if [ "$API_MODE" = "local" ]; then
     echo -e "${GREEN}🐍 Starting Python Flask server on port ${PYTHON_PORT}...${NC}"
 
@@ -86,10 +129,10 @@ if [ "$API_MODE" = "local" ]; then
     # Start Flask server in background from backend directory
     cd backend
     python app.py &
-    FLASK_PID=$!
+    BACKEND_PID=$!
     cd ..
 
-    echo -e "${GREEN}✅ Flask server started (PID: ${FLASK_PID})${NC}"
+    echo -e "${GREEN}✅ Flask server started (PID: ${BACKEND_PID})${NC}"
     echo -e "${GREEN}   Backend API: http://127.0.0.1:${PYTHON_PORT}${NC}"
     echo -e "${GREEN}   Web App: http://127.0.0.1:${PYTHON_PORT}${NC}"
     echo -e "${GREEN}   Web React: http://127.0.0.1:${PYTHON_PORT}/react${NC}"
@@ -102,40 +145,26 @@ else
     echo ""
 fi
 
-# Start React development server with Vite
-echo -e "${GREEN}⚛️  Starting React TypeScript development server with Vite on port ${REACT_PORT}...${NC}"
+# Start React development server
+echo -e "${GREEN}⚛️  Starting React TypeScript development server on port ${REACT_PORT}...${NC}"
 cd frontend
 
-# Check if node_modules exists
-if [ ! -d "node_modules" ]; then
-    echo -e "${BLUE}📦 Installing React TypeScript dependencies...${NC}"
-    npm install
-fi
-
-# Start Vite dev server
-echo -e "${GREEN}🚀 Starting Vite dev server...${NC}"
-npm run dev &
-REACT_PID=$!
-
-cd ..
-
+# Start Vite dev server in the foreground (last process)
+echo -e "${GREEN}🚀 Development servers are starting up...${NC}"
 echo ""
-echo -e "${GREEN}✅ Vite dev server started (PID: ${REACT_PID})${NC}"
-echo -e "${GREEN}   React TypeScript App: http://localhost:${REACT_PORT}${NC}"
-echo ""
-
-echo -e "${BLUE}🎯 All servers are running!${NC}"
-echo -e "${BLUE}================================${NC}"
 if [ "$API_MODE" = "local" ]; then
-    echo -e "${GREEN}🐍 Python Backend: http://127.0.0.1:${PYTHON_PORT}${NC}"
-    echo -e "${GREEN}🌐 Flask Web App: http://127.0.0.1:${PYTHON_PORT}${NC}"
+    echo -e "${BLUE}📊 Available Services:${NC}"
+    echo -e "${GREEN}   • Python Backend API: http://127.0.0.1:${PYTHON_PORT}/api/json/search${NC}"
+    echo -e "${GREEN}   • Python React App: http://127.0.0.1:${PYTHON_PORT}/react${NC}"
+    echo -e "${GREEN}   • React Dev Server: http://127.0.0.1:${REACT_PORT}${NC}"
+else
+    echo -e "${BLUE}📊 Available Services:${NC}"
+    echo -e "${GREEN}   • Remote API: ${API_URL}${NC}"
+    echo -e "${GREEN}   • React Dev Server: http://127.0.0.1:${REACT_PORT}${NC}"
 fi
-echo -e "${GREEN}⚛️  React TypeScript + Vite: http://localhost:${REACT_PORT}${NC}"
 echo ""
-echo -e "${YELLOW}💡 Use Ctrl+C to stop all servers${NC}"
-echo -e "${YELLOW}💡 To use remote API: ./scripts/start-dev.sh remote${NC}"
-echo -e "${YELLOW}💡 To use local API: ./scripts/start-dev.sh local (or just ./scripts/start-dev.sh)${NC}"
+echo -e "${YELLOW}💡 Press Ctrl+C to stop all servers${NC}"
 echo ""
 
-# Wait for all background processes
-wait
+# This runs in the foreground and will be the main process
+npm run dev

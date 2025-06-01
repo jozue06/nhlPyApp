@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo "-----> Installing Node.js and building React frontend"
+
+# Install Node.js (latest LTS version)
+echo "-----> Installing Node.js..."
+curl -L https://nodejs.org/dist/v18.20.4/node-v18.20.4-linux-x64.tar.xz | tar -xJ -C /tmp
+export PATH="/tmp/node-v18.20.4-linux-x64/bin:$PATH"
+
+# Verify Node.js installation
+echo "-----> Node.js version: $(node --version)"
+echo "-----> npm version: $(npm --version)"
+
+# Build the React frontend
+echo "-----> Building React frontend..."
+cd frontend
+npm install
+npm run build
+cd ..
+
+echo "-----> React build completed successfully!"
